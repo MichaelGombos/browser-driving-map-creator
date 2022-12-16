@@ -11,17 +11,23 @@ const printButton = document.querySelector("#print");
 const result = document.querySelector("#result");
 let mapData = [];
 let currentFill = tileTypes[2] // wall
+let painting = false;
 
-const handleTileFill = (e) => {
-  console.log(e.target.dataset.row);
-  console.log(e.target.dataset.column);
-  console.log(mapData[e.target.dataset.row][e.target.dataset.column])
-  console.log("CURRENT FILL",currentFill);
 
-  mapData[e.target.dataset.row][e.target.dataset.column].type = currentFill;
-  e.target.classList.remove("road","dirt","wall");
-  e.target.classList.add(currentFill.tileName); 
-
+const handleTileFill = (method) => (e) => {
+  if(method == "point"){
+    mapData[e.target.dataset.row][e.target.dataset.column].type = currentFill;
+    e.target.classList.remove("road","dirt","wall");
+    e.target.classList.add(currentFill.tileName); 
+  }
+  else if(method == "drag"){
+    //check if mouse is held down
+    if(painting){
+      mapData[e.target.dataset.row][e.target.dataset.column].type = currentFill;
+      e.target.classList.remove("road","dirt","wall");
+      e.target.classList.add(currentFill.tileName); 
+    }
+  }
 }
 
 const handleTypeChange = (type) => (e) => {
@@ -55,7 +61,8 @@ for(let r = 0; r < rows; r++ ){
       );
     tile.classList.add("tile");
     tile.classList.add("road")
-    tile.addEventListener("mousedown",handleTileFill)
+    tile.addEventListener("mouseover",handleTileFill("drag"))
+    tile.addEventListener("click",handleTileFill("point"))
     row.appendChild(tile);
   }
   map.appendChild(row);
@@ -92,5 +99,7 @@ for(let type of tileTypes){
 
 printButton.addEventListener("click",handlePrint)
 
+document.addEventListener("mousedown", () => painting = true)
+document.addEventListener("mouseup", () => painting = false);
 
 
