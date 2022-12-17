@@ -1,15 +1,20 @@
-const rows = 20;
-const columns = 20;
 const tileTypes = [
   {  tileName:"road",    color:"orange",  colorHex:"#FFA500",  value:0},
   {  tileName:"wall",    color: "red",    colorHex:"#FF0000",  value:1},
   {  tileName:"dirt",    color:"brown",   colorHex:"#964B00",  value:2},  
   {  tileName:"spawn",    color: "cyan",    colorHex:"71c9ff", value:3}
 ]
+const mapCol = document.querySelector("#cols");
+const mapRow = document.querySelector("#rows");
+const mapSizeSubmit = document.querySelector("#map-size-submit");
+
 const map = document.querySelector("#map");
 const paints = document.querySelector("#paints");
 const printButton = document.querySelector("#print");
 const result = document.querySelector("#result");
+
+let rows = 20;
+let columns = 20;
 let mapData = [];
 let currentFill = tileTypes.find(t => t.tileName == "wall"); 
 let painting = false;
@@ -20,6 +25,8 @@ let spawnTile =
   column:2
 }
 let spawnElement;
+let newRow;
+let newColumn;
 
 const fillTile = (e,currentFill) => {
   //set selected tile to new type.
@@ -61,43 +68,65 @@ const handlePrint = (e) => {
   result.innerHTML = "[" + mapData.map(mapRow => "\n[" + mapRow.map(cell => cell.type.value ) + "]") + "\n]";
 }
 
+const handleMapSizeChange = (e) => {
+  e.preventDefault();
+  console.log(e.target);
 
-//generate domMap and mapdata
-for(let r = 0; r < rows; r++ ){
-  let mapRow = new Array();
-  mapData.push(mapRow);
-  let row = document.createElement("div");
-  row.classList.add("row");
-  for(let c = 0; c < columns; c++){
-    let tile = document.createElement("div")
-    tile.dataset.row = r;
-    tile.dataset.column = c;
-    //place spawn tile
-    if(r == spawnTile.row && c == spawnTile.column){
-      mapRow.push(spawnTile);
-      tile.classList.add("tile");
-      tile.classList.add("spawn")
-      spawnElement = tile;
-    }
-    else{
-      mapRow.push(
-        {
-          type:tileTypes[0], //road
-          row:r,
-          column:c
-        });
-        tile.classList.add("tile");
-        tile.classList.add("road")
-    }
+  rows = mapRow.value;
+  columns = mapCol.value;
 
-
-    tile.addEventListener("mouseover",handleTileFill("drag"))
-    tile.addEventListener("click",handleTileFill("point"))
-    row.appendChild(tile);
-  }
-  map.appendChild(row);
+  generateMap();
 }
 
+//generate domMap and mapdata
+
+const generateMap = () => {
+  mapData = [];
+  
+  while(map.firstChild){
+    map.removeChild(map.firstChild);
+  }
+
+
+  for(let r = 0; r < rows; r++ ){
+    let mapRow = new Array();
+    mapData.push(mapRow);
+    let row = document.createElement("div");
+    row.classList.add("row");
+    for(let c = 0; c < columns; c++){
+      let tile = document.createElement("div")
+      tile.dataset.row = r;
+      tile.dataset.column = c;
+      //place spawn tile
+      if(r == spawnTile.row && c == spawnTile.column){
+        mapRow.push(spawnTile);
+        tile.classList.add("tile");
+        tile.classList.add("spawn")
+        spawnElement = tile;
+      }
+      else{
+        mapRow.push(
+          {
+            type:tileTypes[0], //road
+            row:r,
+            column:c
+          });
+          tile.classList.add("tile");
+          tile.classList.add("road")
+      }
+  
+  
+      tile.addEventListener("mouseover",handleTileFill("drag"))
+      tile.addEventListener("click",handleTileFill("point"))
+      row.appendChild(tile);
+    }
+    map.appendChild(row);
+  }
+}
+
+generateMap();
+
+//display tiles 
 for(let type of tileTypes){
   let paint = document.createElement("div")
 
@@ -125,4 +154,5 @@ printButton.addEventListener("click",handlePrint)
 document.addEventListener("mousedown", () => painting = true)
 document.addEventListener("mouseup", () => painting = false);
 
+mapSizeSubmit.addEventListener("click",handleMapSizeChange);
 

@@ -10,13 +10,29 @@
 <body>
   <h1>Draw your map below</h1>
 
+  <h2>Map Size</h2>
+  <form id="map-size">
+    <div class="dimenstions">
+      <label for="rows" name="dimensions">Rows</label>
+      <input id="rows" value="20">
+  
+      <label for="cols" name="dimensions">Columns</label>
+      <input id="cols" value="20">
+    </div>
+    <button type="submit" form="map-size" value="change-size" id="map-size-submit">Change Size</button>
+
+  </form>
+  <h2>Paints</h2>
   <div id="paints">
-    <h2>Paints</h2>
+    
   </div>
   <h2>Board</h2>
-  <div id="map">
+  <div class="map-container">
+      <div class="inner" id="map">
+    </div>
 
   </div>
+
 
   <button id="print">Print 2d map Array</button>
 
