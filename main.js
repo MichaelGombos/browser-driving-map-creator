@@ -63,13 +63,57 @@ const handleTileFill = (method) => (e) => {
   }
 }
 
-const handleTileHover = (currentFill) => (e) => {
-  console.log("Current Fill, Hovering TIle", currentFill, e.target);
+const handleTileHover = (e) => {
+  
   e.target.classList.add("tile-hover")
+  console.log("triggered",currentFill);
+  if(currentFill.tileName == "finish"){
+    console.log("triggered");
+    let r = parseInt(e.target.dataset.row);
+    let c = parseInt(e.target.dataset.column);
+  
+    let bottomBound = 0; 
+    let topBound = mapData[0].length-1;
+  
+    //check if c - 1 c - 2 c + 1 and c + 2 are all actually inside of the array bounds. 
+  
+    for(let checker = -2; checker <= 2 ; checker ++){
+      if(c + checker < bottomBound || c + checker > topBound){
+        console.log("UNABLE TO PLACE FINISH LINE");
+        //reset hover condition
+        break;
+      }
+      else{
+        map.children[r].children[c+checker].classList.add("tile-hover")
+        console.log(map.children[r].children[c+checker]);
+      }
+    }
+  }
 }
 
 const handleRemoveHover = (e) => {
   e.target.classList.remove("tile-hover");
+
+  if(currentFill.tileName == "finish"){
+    let r = parseInt(e.target.dataset.row);
+    let c = parseInt(e.target.dataset.column);
+  
+    let bottomBound = 0; 
+    let topBound = mapData[0].length-1;
+  
+    for(let checker = -2; checker <= 2 ; checker ++){
+      if(c + checker < bottomBound || c + checker > topBound){
+        console.log("UNABLE TO PLACE FINISH LINE");
+        //reset hover condition
+        break;
+      }
+      else{
+        map.children[r].children[c+checker].classList.remove("tile-hover")
+        console.log(map.children[r].children[c+checker]);
+      }
+    }
+  }
+
 }
 
 const handleTypeChange = (type) => (e) => {
@@ -131,7 +175,7 @@ const generateMap = () => {
   
       tile.addEventListener("mouseover",handleTileFill("drag"))
       tile.addEventListener("click",handleTileFill("point"))
-      tile.addEventListener("mouseover", handleTileHover(currentFill))
+      tile.addEventListener("mouseover", handleTileHover)
       tile.addEventListener("mouseout", handleRemoveHover)
       row.appendChild(tile);
     }
