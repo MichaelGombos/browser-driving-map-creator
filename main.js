@@ -63,6 +63,15 @@ const handleTileFill = (method) => (e) => {
   }
 }
 
+const handleTileHover = (currentFill) => (e) => {
+  console.log("Current Fill, Hovering TIle", currentFill, e.target);
+  e.target.classList.add("tile-hover")
+}
+
+const handleRemoveHover = (e) => {
+  e.target.classList.remove("tile-hover");
+}
+
 const handleTypeChange = (type) => (e) => {
   currentFill = type;
 }
@@ -122,6 +131,8 @@ const generateMap = () => {
   
       tile.addEventListener("mouseover",handleTileFill("drag"))
       tile.addEventListener("click",handleTileFill("point"))
+      tile.addEventListener("mouseover", handleTileHover(currentFill))
+      tile.addEventListener("mouseout", handleRemoveHover)
       row.appendChild(tile);
     }
     map.appendChild(row);
@@ -159,4 +170,3 @@ document.addEventListener("mousedown", () => painting = true)
 document.addEventListener("mouseup", () => painting = false);
 
 mapSizeSubmit.addEventListener("click",handleMapSizeChange);
-
