@@ -21,13 +21,14 @@ let currentFill = tileTypes.find(t => t.tileName == "wall");
 let painting = false;
 let spawnTile =    
 {
-  type:tileTypes[3], //spawn
+  type:tileTypes[3], 
   row:6,
-  column:2
+  column:2,
+  element : null
 }
 let finishLine = 
 {
-  type:tileTypes[4], //finish 
+  type:tileTypes[4],  
   row: null,
   columnStart: null,
   columnEnd: null
@@ -44,26 +45,24 @@ const fillTile = (e,currentFill) => {
   e.target.classList.remove("road","dirt","wall","spawn","finish");
   e.target.classList.add(currentFill.tileName); 
 
+
+
   if(currentFill == tileTypes.find(t => t.tileName == "spawn")){
     //if spawn tile is already set,  and change the dom map tile class to road
-    spawnElement.classList.remove("spawn");
-    spawnElement.classList.add("road");
+    spawnTile.element.classList.remove("spawn");
+    spawnTile.element.classList.add("road");
+    mapData[spawnTile.element.dataset.row][spawnTile.element.dataset.column].type = tileTypes[0];
 
     //set spawn element again
-    spawnElement = e.target;
-
-    // TODO actually remove it from mapData,
+    spawnTile.element = e.target;
   }
 
   else if (currentFill.tileName == "finish"){
     //if finish line is set, remove it from mapData, and change the Old finish line tiles to road.
     if(finishLine.row != null && finishLine.columnStart != null && finishLine.columnEnd != null){
-      console.log("FINISH LINE ALREADY EXISTS")
-      console.log(finishLine);
       
       for(let cs = finishLine.columnStart; cs <= finishLine.columnEnd; cs++){
-        mapData[finishLine.row][finishLine.cs] = 0 // road
-        console.log(map.children[finishLine.row].children[cs])
+        mapData[finishLine.row][cs].type = tileTypes[0] // road
         map.children[finishLine.row].children[cs].classList.remove("finish");
         map.children[finishLine.row].children[cs].classList.add("road");
       }
@@ -84,7 +83,7 @@ const fillTile = (e,currentFill) => {
     //check if c - 1 c - 2 c + 1 and c + 2 are all actually inside of the map column bounds. 
     if(finishLineBroken){
       //set current tile to road
-      mapData[r][c] = 0;
+      mapData[r][c].type = tileTypes[0];
       map.children[r].children[c].classList.remove("finish");
       map.children[r].children[c].classList.add("road");
 
@@ -98,7 +97,6 @@ const fillTile = (e,currentFill) => {
         map.children[r].children[c+i].classList.remove(("road","dirt","wall","spawn","finish"))
         map.children[r].children[c+i].classList.add("finish")
         mapData[r][c+i].type = currentFill;
-        console.log(map.children[r].children[c+i]);
       }
     }
    
@@ -123,7 +121,6 @@ const handleTileHover = (e) => {
   e.target.classList.add("tile-hover")
   // console.log("triggered",currentFill);
   if(currentFill.tileName == "finish"){
-    console.log("triggered");
 
     let checker = 2; //total width of 5
     let r = parseInt(e.target.dataset.row);
@@ -137,10 +134,9 @@ const handleTileHover = (e) => {
     let finishLineBroken = c - checker < bottomBound || c + checker > topBound;
 
     if(finishLineBroken){
-        console.log("UNABLE TO PLACE FINISH LINE");
+        // console.log("UNABLE TO PLACE FINISH LINE");
     }
       else{
-        // console.log(map.children[r].children[c+checker]);
         for(let i = 0-checker; i <= checker ; i ++){
           //set hover tiles  
           map.children[r].children[c+i].classList.add("tile-hover")
@@ -163,10 +159,9 @@ const handleRemoveHover = (e) => {
     let finishLineBroken = c - checker < bottomBound || c + checker > topBound;
 
     if(finishLineBroken){
-      console.log("UNABLE TO PLACE FINISH LINE");
+      // console.log("UNABLE TO PLACE FINISH LINE");
   }
     else{
-      // console.log(map.children[r].children[c+checker]);
       for(let i = 0-checker; i <= checker ; i ++){
         //set hover tiles  
         map.children[r].children[c+i].classList.remove("tile-hover")
@@ -181,7 +176,6 @@ const handleTypeChange = (type) => (e) => {
 }
 
 const handlePrint = (e) => {
-  // console.log(mapData.map(mapRow => mapRow.map(cell => cell.type.value ) ))
   result.innerHTML = "[" + mapData.map(mapRow => "\n[" + mapRow.map(cell => cell.type.value ) + "]") + "\n]";
 }
 
@@ -219,7 +213,7 @@ const generateMap = () => {
         mapRow.push(spawnTile);
         tile.classList.add("tile");
         tile.classList.add("spawn")
-        spawnElement = tile;
+        spawnTile.element = tile;
       }
       else{
         mapRow.push(
