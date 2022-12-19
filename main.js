@@ -13,6 +13,9 @@ const map = document.querySelector("#map");
 const paints = document.querySelector("#paints");
 const printButton = document.querySelector("#print");
 const result = document.querySelector("#result");
+const uploadButton = document.querySelector("#upload");
+const mapInput = document.querySelector("#map-input")
+
 
 let rows = 20;
 let columns = 20;
@@ -189,6 +192,7 @@ const handleMapSizeChange = (e) => {
   generateMap();
 }
 
+//TODO -- seperate
 //generate domMap and mapdata
 
 const generateMap = () => {
