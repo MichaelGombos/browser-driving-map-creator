@@ -20,7 +20,10 @@ const mapInput = document.querySelector("#map-input")
 let rows = 20;
 let columns = 20;
 let mapData = [];
-let currentFill = tileTypes.find(t => t.tileName == "wall"); 
+let currentFill = {
+  type : tileTypes.find(t => t.tileName == "wall"),
+  size : 1
+}
 let painting = false;
 let spawnTile =    
 {
@@ -42,15 +45,15 @@ let newColumn;
 
 const fillTile = (e,currentFill) => {
   //set selected tile to new type.
-  mapData[e.target.dataset.row][e.target.dataset.column] = currentFill.value;
+  mapData[e.target.dataset.row][e.target.dataset.column] = currentFill.type.value;
 
   //remove all classes from selected tile 
   e.target.classList.remove("road","dirt","wall","spawn","finish");
-  e.target.classList.add(currentFill.tileName); 
+  e.target.classList.add(currentFill.type.tileName); 
 
 
-
-  if(currentFill == tileTypes.find(t => t.tileName == "spawn")){
+console.log(currentFill);
+  if(currentFill.type.tileName == "spawn"){
     //if spawn tile is already set,  and change the dom map tile class to road
     spawnTile.element.classList.remove("spawn");
     spawnTile.element.classList.add("road");
@@ -60,7 +63,7 @@ const fillTile = (e,currentFill) => {
     spawnTile.element = e.target;
   }
 
-  else if (currentFill.tileName == "finish"){
+  else if (currentFill.type.tileName == "finish"){
     //if finish line is set, remove it from mapData, and change the Old finish line tiles to road.
     if(finishLine.row != null && finishLine.columnStart != null && finishLine.columnEnd != null){
       
@@ -75,7 +78,7 @@ const fillTile = (e,currentFill) => {
     }
 
 
-    //fill logic
+    //fill finishLine logic
     let checker = 2; //total width of 5
     let r = parseInt(e.target.dataset.row);
     let c = parseInt(e.target.dataset.column);
@@ -99,12 +102,12 @@ const fillTile = (e,currentFill) => {
         finishLine.columnEnd = c + checker;
         map.children[r].children[c+i].classList.remove(("road","dirt","wall","spawn","finish"))
         map.children[r].children[c+i].classList.add("finish")
-        mapData[r][c+i] = currentFill.value;
+        mapData[r][c+i] = currentFill.type.value;
       }
     }
    
   }
-  
+
 }
 
 const handleTileFill = (method) => (e) => {
@@ -123,7 +126,7 @@ const handleTileHover = (e) => {
   
   e.target.classList.add("tile-hover")
   // console.log("triggered",currentFill);
-  if(currentFill.tileName == "finish"){
+  if(currentFill.type.tileName == "finish"){
 
     let checker = 2; //total width of 5
     let r = parseInt(e.target.dataset.row);
@@ -151,7 +154,7 @@ const handleTileHover = (e) => {
 const handleRemoveHover = (e) => {
   e.target.classList.remove("tile-hover");
 
-  if(currentFill.tileName == "finish"){
+  if(currentFill.type.tileName == "finish"){
     let checker = 2; //total width of 5
     let r = parseInt(e.target.dataset.row);
     let c = parseInt(e.target.dataset.column);
@@ -175,7 +178,7 @@ const handleRemoveHover = (e) => {
 }
 
 const handleTypeChange = (type) => (e) => {
-  currentFill = type;
+  currentFill.type = type;
 }
 
 const handlePrint = (e) => {
@@ -235,25 +238,25 @@ const generateMap = (data) => {
       //spawn tile 
 
       //set tile based on value 
-      if(mapData[r][c] == 4 ){//spawn
+      if(mapData[r][c] == 4 ){
         tile.classList.add("tile");
         tile.classList.add("finish")
         //find finish line dimensions
       }
-      if(mapData[r][c] == 3 ){//spawn
+      else if(mapData[r][c] == 3 ){
         tile.classList.add("tile");
         tile.classList.add("spawn")
         spawnTile.element = tile;
       }
-      if(mapData[r][c] == 2 ){//spawn
+      else if(mapData[r][c] == 2 ){
         tile.classList.add("tile");
         tile.classList.add("dirt")
       }
-      if(mapData[r][c] == 1 ){//spawn
+      else if(mapData[r][c] == 1 ){
         tile.classList.add("tile");
         tile.classList.add("wall")
       }
-      else{
+      else if(mapData[r][c] == 0 ){
           tile.classList.add("tile");
           tile.classList.add("road")
       }
