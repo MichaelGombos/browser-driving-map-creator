@@ -182,6 +182,10 @@ const handlePrint = (e) => {
   result.innerHTML = "[" + mapData.map(mapRow => "\n[" + mapRow.map(cell => cell.type.value ) + "]") + "\n]";
 }
 
+const handleUpload = (e) => {
+  generateMap(JSON.parse("[" + mapInput.value + "]")[0])
+}
+
 const handleMapSizeChange = (e) => {
   e.preventDefault();
   console.log(e.target);
@@ -189,7 +193,7 @@ const handleMapSizeChange = (e) => {
   rows = mapRow.value;
   columns = mapCol.value;
 
-  generateMap();
+  generateMap(generateDefaultMapData(rows,columns));
 }
 
 //TODO -- seperate
@@ -211,8 +215,8 @@ const generateDefaultMapData = (rows,columns) => {
   }
   return primativeMapData;
 }
-const generateMap = () => {
-  mapData = generateDefaultMapData(rows,columns);
+const generateMap = (data) => {
+  mapData = data;
   
   //clear map
   while(map.firstChild){
@@ -262,45 +266,10 @@ const generateMap = () => {
     }
     map.appendChild(row);
   }
-  // for(let r = 0; r < rows; r++ ){
-  //   let mapRow = new Array();
-  //   mapData.push(mapRow);
-  //   let row = document.createElement("div");
-  //   row.classList.add("row");
-  //   for(let c = 0; c < columns; c++){
-  //     let tile = document.createElement("div")
-  //     tile.dataset.row = r;
-  //     tile.dataset.column = c;
-  //     //place spawn tile
-  //     if(r == spawnTile.row && c == spawnTile.column){
-  //       mapRow.push(spawnTile);
-  //       tile.classList.add("tile");
-  //       tile.classList.add("spawn")
-  //       spawnTile.element = tile;
-  //     }
-  //     else{
-  //       mapRow.push(
-  //         {
-  //           type:tileTypes[0], //road
-  //           row:r,
-  //           column:c
-  //         });
-  //         tile.classList.add("tile");
-  //         tile.classList.add("road")
-  //     }
-  
-  
-  //     tile.addEventListener("mouseover",handleTileFill("drag"))
-  //     tile.addEventListener("click",handleTileFill("point"))
-  //     tile.addEventListener("mouseover", handleTileHover)
-  //     tile.addEventListener("mouseout", handleRemoveHover)
-  //     row.appendChild(tile);
-  //   }
-  //   map.appendChild(row);
-  // }
+
 }
 
-generateMap();
+generateMap(generateDefaultMapData(rows,columns));
 
 //display tiles 
 for(let type of tileTypes){
@@ -326,6 +295,7 @@ for(let type of tileTypes){
 }
 
 printButton.addEventListener("click",handlePrint)
+uploadButton.addEventListener("click",handleUpload);
 
 document.addEventListener("mousedown", () => painting = true)
 document.addEventListener("mouseup", () => painting = false);
