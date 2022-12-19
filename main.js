@@ -26,7 +26,7 @@ let spawnTile =
 {
   type:tileTypes[3], 
   row:6,
-  column:2,
+  column:8,
   element : null
 }
 let finishLine = 
@@ -194,43 +194,66 @@ const handleMapSizeChange = (e) => {
 
 //TODO -- seperate
 //generate domMap and mapdata
+const generateDefaultMapData = (rows,columns) => {
+  let primativeMapData = [];
 
+  for(let r = 0; r < rows; r++ ){
+    let mapRow = new Array();
+    for(let c = 0; c < columns; c++){
+      if(r == spawnTile.row && c == spawnTile.column){
+        mapRow.push(3); //spawn 
+      }
+      else{
+        mapRow.push(0); // road
+      }
+    }
+    primativeMapData.push(mapRow);
+  }
+  return primativeMapData;
+}
 const generateMap = () => {
-  mapData = [];
+  mapData = generateDefaultMapData(rows,columns);
   
+  //clear map
   while(map.firstChild){
     map.removeChild(map.firstChild);
   }
 
-
-  for(let r = 0; r < rows; r++ ){
-    let mapRow = new Array();
-    mapData.push(mapRow);
+  console.log(mapData);
+  for(let r = 0; r < mapData.length; r++){
     let row = document.createElement("div");
     row.classList.add("row");
-    for(let c = 0; c < columns; c++){
+    for(let c = 0; c < mapData[0].length; c++){
       let tile = document.createElement("div")
       tile.dataset.row = r;
       tile.dataset.column = c;
-      //place spawn tile
-      if(r == spawnTile.row && c == spawnTile.column){
-        mapRow.push(spawnTile);
+
+      //spawn tile 
+
+      //set tile based on value 
+      if(mapData[r][c] == 4 ){//spawn
+        tile.classList.add("tile");
+        tile.classList.add("finish")
+        //find finish line dimensions
+      }
+      if(mapData[r][c] == 3 ){//spawn
         tile.classList.add("tile");
         tile.classList.add("spawn")
         spawnTile.element = tile;
       }
+      if(mapData[r][c] == 2 ){//spawn
+        tile.classList.add("tile");
+        tile.classList.add("dirt")
+      }
+      if(mapData[r][c] == 1 ){//spawn
+        tile.classList.add("tile");
+        tile.classList.add("wall")
+      }
       else{
-        mapRow.push(
-          {
-            type:tileTypes[0], //road
-            row:r,
-            column:c
-          });
           tile.classList.add("tile");
           tile.classList.add("road")
       }
-  
-  
+
       tile.addEventListener("mouseover",handleTileFill("drag"))
       tile.addEventListener("click",handleTileFill("point"))
       tile.addEventListener("mouseover", handleTileHover)
@@ -239,6 +262,42 @@ const generateMap = () => {
     }
     map.appendChild(row);
   }
+  // for(let r = 0; r < rows; r++ ){
+  //   let mapRow = new Array();
+  //   mapData.push(mapRow);
+  //   let row = document.createElement("div");
+  //   row.classList.add("row");
+  //   for(let c = 0; c < columns; c++){
+  //     let tile = document.createElement("div")
+  //     tile.dataset.row = r;
+  //     tile.dataset.column = c;
+  //     //place spawn tile
+  //     if(r == spawnTile.row && c == spawnTile.column){
+  //       mapRow.push(spawnTile);
+  //       tile.classList.add("tile");
+  //       tile.classList.add("spawn")
+  //       spawnTile.element = tile;
+  //     }
+  //     else{
+  //       mapRow.push(
+  //         {
+  //           type:tileTypes[0], //road
+  //           row:r,
+  //           column:c
+  //         });
+  //         tile.classList.add("tile");
+  //         tile.classList.add("road")
+  //     }
+  
+  
+  //     tile.addEventListener("mouseover",handleTileFill("drag"))
+  //     tile.addEventListener("click",handleTileFill("point"))
+  //     tile.addEventListener("mouseover", handleTileHover)
+  //     tile.addEventListener("mouseout", handleRemoveHover)
+  //     row.appendChild(tile);
+  //   }
+  //   map.appendChild(row);
+  // }
 }
 
 generateMap();
