@@ -42,7 +42,7 @@ let newColumn;
 
 const fillTile = (e,currentFill) => {
   //set selected tile to new type.
-  mapData[e.target.dataset.row][e.target.dataset.column].type = currentFill;
+  mapData[e.target.dataset.row][e.target.dataset.column] = currentFill.value;
 
   //remove all classes from selected tile 
   e.target.classList.remove("road","dirt","wall","spawn","finish");
@@ -54,7 +54,7 @@ const fillTile = (e,currentFill) => {
     //if spawn tile is already set,  and change the dom map tile class to road
     spawnTile.element.classList.remove("spawn");
     spawnTile.element.classList.add("road");
-    mapData[spawnTile.element.dataset.row][spawnTile.element.dataset.column].type = tileTypes[0];
+    mapData[spawnTile.element.dataset.row][spawnTile.element.dataset.column] = 0; //road
 
     //set spawn element again
     spawnTile.element = e.target;
@@ -65,7 +65,7 @@ const fillTile = (e,currentFill) => {
     if(finishLine.row != null && finishLine.columnStart != null && finishLine.columnEnd != null){
       
       for(let cs = finishLine.columnStart; cs <= finishLine.columnEnd; cs++){
-        mapData[finishLine.row][cs].type = tileTypes[0] // road
+        mapData[finishLine.row][cs] = 0; // road
         map.children[finishLine.row].children[cs].classList.remove("finish");
         map.children[finishLine.row].children[cs].classList.add("road");
       }
@@ -86,7 +86,7 @@ const fillTile = (e,currentFill) => {
     //check if c - 1 c - 2 c + 1 and c + 2 are all actually inside of the map column bounds. 
     if(finishLineBroken){
       //set current tile to road
-      mapData[r][c].type = tileTypes[0];
+      mapData[r][c] = 0;
       map.children[r].children[c].classList.remove("finish");
       map.children[r].children[c].classList.add("road");
 
@@ -99,7 +99,7 @@ const fillTile = (e,currentFill) => {
         finishLine.columnEnd = c + checker;
         map.children[r].children[c+i].classList.remove(("road","dirt","wall","spawn","finish"))
         map.children[r].children[c+i].classList.add("finish")
-        mapData[r][c+i].type = currentFill;
+        mapData[r][c+i] = currentFill.value;
       }
     }
    
@@ -179,7 +179,7 @@ const handleTypeChange = (type) => (e) => {
 }
 
 const handlePrint = (e) => {
-  result.innerHTML = "[" + mapData.map(mapRow => "\n[" + mapRow.map(cell => cell.type.value ) + "]") + "\n]";
+  result.innerHTML = "[" + mapData.map(mapRow => "\n[" + mapRow.map(cell => cell ) + "]") + "\n]";
 }
 
 const handleUpload = (e) => {
