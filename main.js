@@ -25,6 +25,13 @@ let spawnTile =
   row:6,
   column:2
 }
+let finishLine = 
+{
+  type:tileTypes[4], //finish 
+  row: null,
+  columnStart: null,
+  columnEnd: null
+}
 let spawnElement;
 let newRow;
 let newColumn;
@@ -35,20 +42,68 @@ const fillTile = (e,currentFill) => {
 
   //remove all classes from selected tile 
   e.target.classList.remove("road","dirt","wall","spawn","finish");
+  e.target.classList.add(currentFill.tileName); 
 
   if(currentFill == tileTypes.find(t => t.tileName == "spawn")){
-    //if spawn tile is already set, remove it from mapData, and change the dom map tile class to road
+    //if spawn tile is already set,  and change the dom map tile class to road
     spawnElement.classList.remove("spawn");
     spawnElement.classList.add("road");
 
     //set spawn element again
     spawnElement = e.target;
+
+    // TODO actually remove it from mapData,
   }
 
-  else if(currentFill == tileTypes.find(t => t.tileName == "finish")){
-    console.log("HERE COMES THE FINISH LINE LOGIC")
+  else if (currentFill.tileName == "finish"){
+    //if finish line is set, remove it from mapData, and change the Old finish line tiles to road.
+    if(finishLine.row != null && finishLine.columnStart != null && finishLine.columnEnd != null){
+      console.log("FINISH LINE ALREADY EXISTS")
+      console.log(finishLine);
+      
+      for(let cs = finishLine.columnStart; cs <= finishLine.columnEnd; cs++){
+        mapData[finishLine.row][finishLine.cs] = 0 // road
+        console.log(map.children[finishLine.row].children[cs])
+        map.children[finishLine.row].children[cs].classList.remove("finish");
+        map.children[finishLine.row].children[cs].classList.add("road");
+      }
+    }
+    else{
+      //no finish line yet. 
+    }
+
+
+    //fill logic
+    let checker = 2; //total width of 5
+    let r = parseInt(e.target.dataset.row);
+    let c = parseInt(e.target.dataset.column);
+  
+    let bottomBound = 0; 
+    let topBound = mapData[0].length-1;
+    let finishLineBroken = c - checker < bottomBound || c + checker > topBound;
+    //check if c - 1 c - 2 c + 1 and c + 2 are all actually inside of the map column bounds. 
+    if(finishLineBroken){
+      //set current tile to road
+      mapData[r][c] = 0;
+      map.children[r].children[c].classList.remove("finish");
+      map.children[r].children[c].classList.add("road");
+
+    }
+    else{
+      for(let i = 0-checker; i <= checker ; i ++){
+        //set finish line 
+        finishLine.row = r;
+        finishLine.columnStart = c - checker;
+        finishLine.columnEnd = c + checker;
+        map.children[r].children[c+i].classList.remove(("road","dirt","wall","spawn","finish"))
+        map.children[r].children[c+i].classList.add("finish")
+        mapData[r][c+i].type = currentFill;
+        console.log(map.children[r].children[c+i]);
+      }
+    }
+   
   }
-  e.target.classList.add(currentFill.tileName); 
+  
 }
 
 const handleTileFill = (method) => (e) => {
@@ -66,50 +121,55 @@ const handleTileFill = (method) => (e) => {
 const handleTileHover = (e) => {
   
   e.target.classList.add("tile-hover")
-  console.log("triggered",currentFill);
+  // console.log("triggered",currentFill);
   if(currentFill.tileName == "finish"){
     console.log("triggered");
+
+    let checker = 2; //total width of 5
     let r = parseInt(e.target.dataset.row);
     let c = parseInt(e.target.dataset.column);
-  
+
+
     let bottomBound = 0; 
     let topBound = mapData[0].length-1;
   
     //check if c - 1 c - 2 c + 1 and c + 2 are all actually inside of the array bounds. 
-  
-    for(let checker = -2; checker <= 2 ; checker ++){
-      if(c + checker < bottomBound || c + checker > topBound){
+    let finishLineBroken = c - checker < bottomBound || c + checker > topBound;
+
+    if(finishLineBroken){
         console.log("UNABLE TO PLACE FINISH LINE");
-        //reset hover condition
-        break;
-      }
+    }
       else{
-        map.children[r].children[c+checker].classList.add("tile-hover")
-        console.log(map.children[r].children[c+checker]);
+        // console.log(map.children[r].children[c+checker]);
+        for(let i = 0-checker; i <= checker ; i ++){
+          //set hover tiles  
+          map.children[r].children[c+i].classList.add("tile-hover")
+        }
       }
     }
-  }
 }
 
 const handleRemoveHover = (e) => {
   e.target.classList.remove("tile-hover");
 
   if(currentFill.tileName == "finish"){
+    let checker = 2; //total width of 5
     let r = parseInt(e.target.dataset.row);
     let c = parseInt(e.target.dataset.column);
   
     let bottomBound = 0; 
     let topBound = mapData[0].length-1;
-  
-    for(let checker = -2; checker <= 2 ; checker ++){
-      if(c + checker < bottomBound || c + checker > topBound){
-        console.log("UNABLE TO PLACE FINISH LINE");
-        //reset hover condition
-        break;
-      }
-      else{
-        map.children[r].children[c+checker].classList.remove("tile-hover")
-        console.log(map.children[r].children[c+checker]);
+
+    let finishLineBroken = c - checker < bottomBound || c + checker > topBound;
+
+    if(finishLineBroken){
+      console.log("UNABLE TO PLACE FINISH LINE");
+  }
+    else{
+      // console.log(map.children[r].children[c+checker]);
+      for(let i = 0-checker; i <= checker ; i ++){
+        //set hover tiles  
+        map.children[r].children[c+i].classList.remove("tile-hover")
       }
     }
   }

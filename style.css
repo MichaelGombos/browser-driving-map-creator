@@ -36,7 +36,7 @@ body{
   outline: 1px solid rgba(255, 255, 255, 0);
   z-index: 0;
   transition-property:outline  z-index  ;
-  transition: outline 0.1s linear  , z-index 1s ease-out ;
+  transition: outline 0.4s linear  , z-index 1s ease-out ;
 }
 
 #result{
