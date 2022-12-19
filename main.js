@@ -2,7 +2,8 @@ const tileTypes = [
   {  tileName:"road",    color:"orange",  colorHex:"#FFA500",  value:0},
   {  tileName:"wall",    color: "red",    colorHex:"#FF0000",  value:1},
   {  tileName:"dirt",    color:"brown",   colorHex:"#964B00",  value:2},  
-  {  tileName:"spawn",    color: "cyan",    colorHex:"71c9ff", value:3}
+  {  tileName:"spawn",    color: "cyan",    colorHex:"#71c9ff", value:3},
+  { tileName:"finish", color:"green", colorHex:"#73ff71", value:4}
 ]
 const mapCol = document.querySelector("#cols");
 const mapRow = document.querySelector("#rows");
@@ -21,7 +22,7 @@ let painting = false;
 let spawnTile =    
 {
   type:tileTypes[3], //spawn
-  row:2,
+  row:6,
   column:2
 }
 let spawnElement;
@@ -33,7 +34,7 @@ const fillTile = (e,currentFill) => {
   mapData[e.target.dataset.row][e.target.dataset.column].type = currentFill;
 
   //remove all classes from selected tile 
-  e.target.classList.remove("road","dirt","wall","spawn");
+  e.target.classList.remove("road","dirt","wall","spawn","finish");
 
   if(currentFill == tileTypes.find(t => t.tileName == "spawn")){
     //if spawn tile is already set, remove it from mapData, and change the dom map tile class to road
@@ -44,6 +45,9 @@ const fillTile = (e,currentFill) => {
     spawnElement = e.target;
   }
 
+  else if(currentFill == tileTypes.find(t => t.tileName == "finish")){
+    console.log("HERE COMES THE FINISH LINE LOGIC")
+  }
   e.target.classList.add(currentFill.tileName); 
 }
 

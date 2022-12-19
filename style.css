@@ -72,7 +72,9 @@ body{
 .spawn{
   background-color:#71c9ff;
 }
-
+.finish{
+  background-color:#73ff71;
+}
 #map-size{
   display:flex;
   flex-direction:column;
