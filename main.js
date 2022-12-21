@@ -22,7 +22,7 @@ let columns = 20;
 let mapData = [];
 let currentFill = {
   type : tileTypes.find(t => t.tileName == "wall"),
-  size : 1
+  size : 2
 }
 let painting = false;
 let spawnTile =    
@@ -44,6 +44,15 @@ let newRow;
 let newColumn;
 
 const fillTile = (e,currentFill) => {
+  //check map bounds.
+  const leftBound = 0; 
+  const rightBound = mapData[0].length-1;
+  const topBound = 0;
+  const bottomBound = mapData.length-1;
+
+  const r = parseInt(e.target.dataset.row);
+  const c = parseInt(e.target.dataset.column);
+
   //set selected tile to new type.
   mapData[e.target.dataset.row][e.target.dataset.column] = currentFill.type.value;
 
@@ -52,7 +61,6 @@ const fillTile = (e,currentFill) => {
   e.target.classList.add(currentFill.type.tileName); 
 
 
-console.log(currentFill);
   if(currentFill.type.tileName == "spawn"){
     //if spawn tile is already set,  and change the dom map tile class to road
     spawnTile.element.classList.remove("spawn");
@@ -80,12 +88,8 @@ console.log(currentFill);
 
     //fill finishLine logic
     let checker = 2; //total width of 5
-    let r = parseInt(e.target.dataset.row);
-    let c = parseInt(e.target.dataset.column);
   
-    let bottomBound = 0; 
-    let topBound = mapData[0].length-1;
-    let finishLineBroken = c - checker < bottomBound || c + checker > topBound;
+    let finishLineBroken = c - checker < leftBound || c + checker > rightBound;
     //check if c - 1 c - 2 c + 1 and c + 2 are all actually inside of the map column bounds. 
     if(finishLineBroken){
       //set current tile to road
@@ -106,6 +110,41 @@ console.log(currentFill);
       }
     }
    
+  }
+
+  //check for fill size
+  else if(currentFill.size == 2){
+    //check if c + 1 < rightBound, confirm if r + 1 < bottomBound. (square w/ origin in top right)
+   if(c + 1 <= rightBound && r + 1 <= bottomBound){
+     console.log("within range for fill2 ");
+     let fillTiles = [
+       { // origin
+         r: r,
+         c : c
+       },
+       { // right
+         r:r ,
+         c: c + 1
+       },
+       { // bottom
+         r: r+1,
+         c: c
+       },
+       { // bottom right
+         r: r+1,
+         c: c+1
+       }
+     ]
+
+     for (let tileCoords of fillTiles){
+      map.children[tileCoords.r].children[tileCoords.c].classList.remove(("road","dirt","wall","spawn","finish"))
+      map.children[tileCoords.r].children[tileCoords.c].classList.add(currentFill.type.tileName);
+     }
+     console.log(fillTiles);
+   }
+   else{
+     console.log("outside of range for fill2", r , c);
+   }
   }
 
 }
