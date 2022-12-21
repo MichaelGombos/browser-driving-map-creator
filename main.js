@@ -22,7 +22,7 @@ let columns = 20;
 let mapData = [];
 let currentFill = {
   type : tileTypes.find(t => t.tileName == "wall"),
-  size : 2
+  size : 3
 }
 let painting = false;
 let spawnTile =    
@@ -112,7 +112,7 @@ const fillTile = (e,currentFill) => {
    
   }
 
-  //check for fill size
+  //brush size 2 
   else if(currentFill.size == 2){
     //check if c + 1 < rightBound, confirm if r + 1 < bottomBound. (square w/ origin in top right)
    if(c + 1 <= rightBound && r + 1 <= bottomBound){
@@ -139,6 +139,7 @@ const fillTile = (e,currentFill) => {
      for (let tileCoords of fillTiles){
       map.children[tileCoords.r].children[tileCoords.c].classList.remove(("road","dirt","wall","spawn","finish"))
       map.children[tileCoords.r].children[tileCoords.c].classList.add(currentFill.type.tileName);
+      mapData[tileCoords.r][tileCoords.c] = currentFill.type.value;
      }
      console.log(fillTiles);
    }
@@ -147,6 +148,46 @@ const fillTile = (e,currentFill) => {
    }
   }
 
+  //brush size 3 
+  else if(currentFill.size == 3){
+    //check if c - 1 > leftBound && c+ 1 < rightBound && r -1 > topBound && r + 1 < bottomBound
+    if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound) {
+      console.log("In of range for fill3", r , c);
+      let fillTiles = [
+        {
+          //origin
+          r: r,
+          c: c
+        },
+        { // top
+          r: r- 1,
+          c: c
+        },
+        {//left
+          r: r,
+          c: c-1
+        },
+        {//bottom
+          r: r+1,
+          c: c
+        },
+        {//right
+          r: r,
+          c: c+1
+        }
+      ]
+    for (let tileCoords of fillTiles){
+      map.children[tileCoords.r].children[tileCoords.c].classList.remove(("road","dirt","wall","spawn","finish"))
+      map.children[tileCoords.r].children[tileCoords.c].classList.add(currentFill.type.tileName);
+      mapData[tileCoords.r][tileCoords.c] = currentFill.type.value;
+     }
+     console.log(fillTiles);
+   }
+    
+    else{
+      console.log("outside of range for fill3", r , c);
+    }
+  }
 }
 
 const handleTileFill = (method) => (e) => {
