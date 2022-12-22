@@ -17,12 +17,13 @@ const uploadButton = document.querySelector("#upload");
 const mapInput = document.querySelector("#map-input")
 const brushSizeSelect = document.querySelector("#brush-size-select")
 
+let mapData = [];
+
 let rows = 20;
 let columns = 20;
-let mapData = [];
 let currentFill = {
   type : tileTypes.find(t => t.tileName == "wall"),
-  size : 3
+  size : 1
 }
 let painting = false;
 let spawnTile =    
@@ -43,8 +44,34 @@ let spawnElement;
 let newRow;
 let newColumn;
 
-const fillTile = (e,currentFill) => {
-  //check map bounds.
+let brushSizes = //each brush size is an array of coord objects
+{
+  finish: [
+    {r:0, c:-2}, { r:0, c:-1 },{ r:0,  c:0 }, { r:0 , c:1} , {r:0, c:2}
+  ],
+  brush1: [
+    {r:0,c:0}
+  ],
+  brush2: [
+    {r:0,c:0},{r:0,c:1},{r:1,c:0},{r:1,c:1}
+  ],
+  brush3: [
+    {r:-1,c:0},{r:0,c:-1},{r:0,c:0},{r:1,c:0},{r:0,c:1}
+  ]
+}
+
+const setTile = (coords, type) => {
+  // //set selected tile to new type. BASED ON S S S S IIIIZE!!!!
+
+  mapData[coords.r][coords.c] = currentFill.type.value;
+  let tile = map.children[coords.r].children[coords.c];
+
+  // //remove all classes from selected tile , then add 
+  tile.classList.remove("road","dirt","wall","spawn","finish");
+  tile.classList.add(currentFill.type.tileName); 
+}
+
+const fillTiles = (e,currentFill) => {
   const leftBound = 0; 
   const rightBound = mapData[0].length-1;
   const topBound = 0;
@@ -53,13 +80,8 @@ const fillTile = (e,currentFill) => {
   const r = parseInt(e.target.dataset.row);
   const c = parseInt(e.target.dataset.column);
 
-  //set selected tile to new type.
-  mapData[e.target.dataset.row][e.target.dataset.column] = currentFill.type.value;
-
-  //remove all classes from selected tile 
-  e.target.classList.remove("road","dirt","wall","spawn","finish");
-  e.target.classList.add(currentFill.type.tileName); 
-
+  //set center tile
+  setTile({r:r,c:c},currentFill);
 
   if(currentFill.type.tileName == "spawn"){
     //if spawn tile is already set,  and change the dom map tile class to road
@@ -69,6 +91,7 @@ const fillTile = (e,currentFill) => {
 
     //set spawn element again
     spawnTile.element = e.target;
+
   }
 
   else if (currentFill.type.tileName == "finish"){
@@ -84,13 +107,9 @@ const fillTile = (e,currentFill) => {
     else{
       //no finish line yet. 
     }
-
-
-    //fill finishLine logic
-    let checker = 2; //total width of 5
   
-    let finishLineBroken = c - checker < leftBound || c + checker > rightBound;
-    //check if c - 1 c - 2 c + 1 and c + 2 are all actually inside of the map column bounds. 
+    const finishLineBroken = c - 2 < leftBound || c + 2 > rightBound; //total size of 5
+
     if(finishLineBroken){
       //set current tile to road
       mapData[r][c] = 0;
@@ -99,14 +118,13 @@ const fillTile = (e,currentFill) => {
 
     }
     else{
-      for(let i = 0-checker; i <= checker ; i ++){
-        //set finish line 
-        finishLine.row = r;
-        finishLine.columnStart = c - checker;
-        finishLine.columnEnd = c + checker;
-        map.children[r].children[c+i].classList.remove(("road","dirt","wall","spawn","finish"))
-        map.children[r].children[c+i].classList.add("finish")
-        mapData[r][c+i] = currentFill.type.value;
+      // set finish line 
+      finishLine.row = r;
+      finishLine.columnStart = c - 2;
+      finishLine.columnEnd = c + 2;
+
+      for(let coord of brushSizes.finish){      
+        setTile({r:r+coord.r,c:c+coord.c},currentFill);
       }
     }
    
@@ -117,31 +135,9 @@ const fillTile = (e,currentFill) => {
     //check if c + 1 < rightBound, confirm if r + 1 < bottomBound. (square w/ origin in top right)
    if(c + 1 <= rightBound && r + 1 <= bottomBound){
      console.log("within range for fill2 ");
-     let fillTiles = [
-       { // origin
-         r: r,
-         c : c
-       },
-       { // right
-         r:r ,
-         c: c + 1
-       },
-       { // bottom
-         r: r+1,
-         c: c
-       },
-       { // bottom right
-         r: r+1,
-         c: c+1
-       }
-     ]
-
-     for (let tileCoords of fillTiles){
-      map.children[tileCoords.r].children[tileCoords.c].classList.remove(("road","dirt","wall","spawn","finish"))
-      map.children[tileCoords.r].children[tileCoords.c].classList.add(currentFill.type.tileName);
-      mapData[tileCoords.r][tileCoords.c] = currentFill.type.value;
-     }
-     console.log(fillTiles);
+     for(let coord of brushSizes.brush2){      
+      setTile({r:r+coord.r,c:c+coord.c},currentFill);
+    }
    }
    else{
      console.log("outside of range for fill2", r , c);
@@ -153,34 +149,9 @@ const fillTile = (e,currentFill) => {
     //check if c - 1 > leftBound && c+ 1 < rightBound && r -1 > topBound && r + 1 < bottomBound
     if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound) {
       console.log("In of range for fill3", r , c);
-      let fillTiles = [
-        {
-          //origin
-          r: r,
-          c: c
-        },
-        { // top
-          r: r- 1,
-          c: c
-        },
-        {//left
-          r: r,
-          c: c-1
-        },
-        {//bottom
-          r: r+1,
-          c: c
-        },
-        {//right
-          r: r,
-          c: c+1
-        }
-      ]
-    for (let tileCoords of fillTiles){
-      map.children[tileCoords.r].children[tileCoords.c].classList.remove(("road","dirt","wall","spawn","finish"))
-      map.children[tileCoords.r].children[tileCoords.c].classList.add(currentFill.type.tileName);
-      mapData[tileCoords.r][tileCoords.c] = currentFill.type.value;
-     }
+      for(let coord of brushSizes.brush3){      
+        setTile({r:r+coord.r,c:c+coord.c},currentFill);
+      }
      console.log(fillTiles);
    }
     
@@ -192,12 +163,12 @@ const fillTile = (e,currentFill) => {
 
 const handleTileFill = (method) => (e) => {
   if(method == "point"){
-    fillTile(e,currentFill);
+    fillTiles(e,currentFill);
   }
   else if(method == "drag"){
     //check if mouse is held down
     if(painting){
-      fillTile(e,currentFill);
+      fillTiles(e,currentFill);
     }
   }
 }
@@ -222,13 +193,16 @@ const handleTileHover = (e) => {
     if(finishLineBroken){
         // console.log("UNABLE TO PLACE FINISH LINE");
     }
-      else{
-        for(let i = 0-checker; i <= checker ; i ++){
-          //set hover tiles  
-          map.children[r].children[c+i].classList.add("tile-hover")
-        }
+    else{
+      for(let i = 0-checker; i <= checker ; i ++){
+        //set hover tiles  
+        map.children[r].children[c+i].classList.add("tile-hover")
       }
     }
+    }
+  else if(currentFill.size == 2){
+
+  }
 }
 
 const handleRemoveHover = (e) => {
@@ -259,6 +233,11 @@ const handleRemoveHover = (e) => {
 
 const handleTypeChange = (type) => (e) => {
   currentFill.type = type;
+  //set fill type, and change fill tiles 
+}
+
+const handleBrushSizeChange = (e) => {
+  currentFill.size =  e.target.value;
 }
 
 const handlePrint = (e) => {
@@ -279,9 +258,7 @@ const handleMapSizeChange = (e) => {
   generateMap(generateDefaultMapData(rows,columns));
 }
 
-const handleBrushSizeChange = (e) => {
-  currentFill.size =  e.target.value;
-}
+
 
 //TODO -- seperate
 //generate domMap and mapdata
