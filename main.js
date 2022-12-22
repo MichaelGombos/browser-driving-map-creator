@@ -15,7 +15,7 @@ const printButton = document.querySelector("#print");
 const result = document.querySelector("#result");
 const uploadButton = document.querySelector("#upload");
 const mapInput = document.querySelector("#map-input")
-
+const brushSizeSelect = document.querySelector("#brush-size-select")
 
 let rows = 20;
 let columns = 20;
@@ -279,6 +279,10 @@ const handleMapSizeChange = (e) => {
   generateMap(generateDefaultMapData(rows,columns));
 }
 
+const handleBrushSizeChange = (e) => {
+  currentFill.size =  e.target.value;
+}
+
 //TODO -- seperate
 //generate domMap and mapdata
 const generateDefaultMapData = (rows,columns) => {
@@ -384,3 +388,4 @@ document.addEventListener("mousedown", () => painting = true)
 document.addEventListener("mouseup", () => painting = false);
 
 mapSizeSubmit.addEventListener("click",handleMapSizeChange);
+brushSizeSelect.addEventListener("change", handleBrushSizeChange);
