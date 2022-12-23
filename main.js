@@ -61,7 +61,6 @@ let brushSizes = //each brush size is an array of coord objects
 }
 
 const setTile = (coords, type) => {
-  // //set selected tile to new type. BASED ON S S S S IIIIZE!!!!
 
   mapData[coords.r][coords.c] = currentFill.type.value;
   let tile = map.children[coords.r].children[coords.c];
@@ -132,7 +131,6 @@ const fillTiles = (e,currentFill) => {
 
   //brush size 2 
   else if(currentFill.size == 2){
-    //check if c + 1 < rightBound, confirm if r + 1 < bottomBound. (square w/ origin in top right)
    if(c + 1 <= rightBound && r + 1 <= bottomBound){
      console.log("within range for fill2 ");
      for(let coord of brushSizes.brush2){      
@@ -146,7 +144,6 @@ const fillTiles = (e,currentFill) => {
 
   //brush size 3 
   else if(currentFill.size == 3){
-    //check if c - 1 > leftBound && c+ 1 < rightBound && r -1 > topBound && r + 1 < bottomBound
     if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound) {
       console.log("In of range for fill3", r , c);
       for(let coord of brushSizes.brush3){      
@@ -176,56 +173,93 @@ const handleTileFill = (method) => (e) => {
 const handleTileHover = (e) => {
   
   e.target.classList.add("tile-hover")
-  // console.log("triggered",currentFill);
+
+  let r = parseInt(e.target.dataset.row);
+  let c = parseInt(e.target.dataset.column);
+
+  const leftBound = 0; 
+  const rightBound = mapData[0].length-1;
+  const topBound = 0;
+  const bottomBound = mapData.length-1;
+
   if(currentFill.type.tileName == "finish"){
 
-    let checker = 2; //total width of 5
-    let r = parseInt(e.target.dataset.row);
-    let c = parseInt(e.target.dataset.column);
-
-
-    let bottomBound = 0; 
-    let topBound = mapData[0].length-1;
-  
-    //check if c - 1 c - 2 c + 1 and c + 2 are all actually inside of the array bounds. 
-    let finishLineBroken = c - checker < bottomBound || c + checker > topBound;
+    let finishLineBroken = c - 2 < bottomBound || c + 2 > topBound;
 
     if(finishLineBroken){
-        // console.log("UNABLE TO PLACE FINISH LINE");
     }
     else{
-      for(let i = 0-checker; i <= checker ; i ++){
-        //set hover tiles  
-        map.children[r].children[c+i].classList.add("tile-hover")
+      for(let coord of brushSizes.finish){      
+        map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
       }
     }
     }
   else if(currentFill.size == 2){
-
+    if(c + 1 <= rightBound && r + 1 <= bottomBound){
+      console.log("within range for fill2 ");
+      for(let coord of brushSizes.brush2){      
+        map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+     }
+    }
+    else{
+      console.log("outside of range for fill2", r , c);
+    }
+  }
+  else if(currentFill.size == 3){
+    if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
+      console.log("within range for fill2 ");
+      for(let coord of brushSizes.brush3){      
+        map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+     }
+    }
+    else{
+      console.log("outside of range for fill2", r , c);
+    }
   }
 }
 
 const handleRemoveHover = (e) => {
   e.target.classList.remove("tile-hover");
 
-  if(currentFill.type.tileName == "finish"){
-    let checker = 2; //total width of 5
-    let r = parseInt(e.target.dataset.row);
-    let c = parseInt(e.target.dataset.column);
-  
-    let bottomBound = 0; 
-    let topBound = mapData[0].length-1;
+  let r = parseInt(e.target.dataset.row);
+  let c = parseInt(e.target.dataset.column);
 
-    let finishLineBroken = c - checker < bottomBound || c + checker > topBound;
+  const leftBound = 0; 
+  const rightBound = mapData[0].length-1;
+  const topBound = 0;
+  const bottomBound = mapData.length-1;
+
+  if(currentFill.type.tileName == "finish"){
+
+    let finishLineBroken = c - 2 < bottomBound || c + 2 > topBound;
 
     if(finishLineBroken){
-      // console.log("UNABLE TO PLACE FINISH LINE");
-  }
+        
+    }
     else{
-      for(let i = 0-checker; i <= checker ; i ++){
-        //set hover tiles  
-        map.children[r].children[c+i].classList.remove("tile-hover")
+      for(let coord of brushSizes.finish){      
+        map.children[r+coord.r].children[c+coord.c].classList.remove("tile-hover")
       }
+    }
+    }
+  else if(currentFill.size == 2){
+    if(c + 1 <= rightBound && r + 1 <= bottomBound){
+      console.log("within range for fill2 ");
+      for(let coord of brushSizes.brush2){      
+        map.children[r+coord.r].children[c+coord.c].classList.remove("tile-hover")
+     }
+    }
+    else{ // console.log("outside of range for fill2", r , c);
+    }
+  }
+  else if(currentFill.size == 3){
+    if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
+      console.log("within range for fill2 ");
+      for(let coord of brushSizes.brush3){      
+        map.children[r+coord.r].children[c+coord.c].classList.remove("tile-hover")
+     }
+    }
+    else{ // console.log("outside of range for fill3", r , c);
     }
   }
 
@@ -233,7 +267,6 @@ const handleRemoveHover = (e) => {
 
 const handleTypeChange = (type) => (e) => {
   currentFill.type = type;
-  //set fill type, and change fill tiles 
 }
 
 const handleBrushSizeChange = (e) => {
