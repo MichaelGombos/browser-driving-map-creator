@@ -82,6 +82,10 @@ body{
 .finish-down{
   background-color:#ff29e2;
 }
+
+.bumper{
+  background-color:#0027d2;
+}
 #map-size{
   display:flex;
   flex-direction:column;

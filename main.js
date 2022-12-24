@@ -4,7 +4,8 @@ const tileTypes = [
   {  tileName:"dirt",    color:"brown",   colorHex:"#964B00",  value:2},  
   {  tileName:"spawn",    color: "cyan",    colorHex:"#71c9ff", value:3},
   { tileName:"finish-up", color:"green", colorHex:"#73ff71", value:4},
-  { tileName:"finish-down", color:"pink", colorHex:"#ff29e2", value:5}
+  { tileName:"finish-down", color:"pink", colorHex:"#ff29e2", value:5},
+  { tileName:"bumper", color:"blue", colorHex:"#0027d2", value:6}
 ]
 const mapCol = document.querySelector("#cols");
 const mapRow = document.querySelector("#rows");
@@ -67,7 +68,7 @@ const setTile = (coords, type) => {
   let tile = map.children[coords.r].children[coords.c];
 
   // //remove all classes from selected tile , then add 
-  tile.classList.remove("road","dirt","wall","spawn","finish-up","finish-down");
+  tile.classList.remove("road","dirt","wall","spawn","finish-up","finish-down","bumper");
   tile.classList.add(currentFill.type.tileName); 
 }
 
@@ -337,6 +338,11 @@ const generateMap = (data) => {
       //spawn tile 
 
       //set tile based on value 
+      if(mapData[r][c] == 6 ){
+        tile.classList.add("tile");
+        tile.classList.add("bumper")
+        //find finish line dimensions
+      }
       if(mapData[r][c] == 5 ){
         tile.classList.add("tile");
         tile.classList.add("finish-down")
