@@ -3,7 +3,8 @@ const tileTypes = [
   {  tileName:"wall",    color: "red",    colorHex:"#FF0000",  value:1},
   {  tileName:"dirt",    color:"brown",   colorHex:"#964B00",  value:2},  
   {  tileName:"spawn",    color: "cyan",    colorHex:"#71c9ff", value:3},
-  { tileName:"finish", color:"green", colorHex:"#73ff71", value:4}
+  { tileName:"finish-up", color:"green", colorHex:"#73ff71", value:4},
+  { tileName:"finish-down", color:"pink", colorHex:"#ff29e2", value:5}
 ]
 const mapCol = document.querySelector("#cols");
 const mapRow = document.querySelector("#rows");
@@ -66,7 +67,7 @@ const setTile = (coords, type) => {
   let tile = map.children[coords.r].children[coords.c];
 
   // //remove all classes from selected tile , then add 
-  tile.classList.remove("road","dirt","wall","spawn","finish");
+  tile.classList.remove("road","dirt","wall","spawn","finish-up","finish-down");
   tile.classList.add(currentFill.type.tileName); 
 }
 
@@ -93,13 +94,13 @@ const fillTiles = (e,currentFill) => {
 
   }
 
-  else if (currentFill.type.tileName == "finish"){
+  else if (currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
     //if finish line is set, remove it from mapData, and change the Old finish line tiles to road.
     if(finishLine.row != null && finishLine.columnStart != null && finishLine.columnEnd != null){
       
       for(let cs = finishLine.columnStart; cs <= finishLine.columnEnd; cs++){
         mapData[finishLine.row][cs] = 0; // road
-        map.children[finishLine.row].children[cs].classList.remove("finish");
+        map.children[finishLine.row].children[cs].classList.remove("finish-up","finish-down");
         map.children[finishLine.row].children[cs].classList.add("road");
       }
     }
@@ -112,7 +113,7 @@ const fillTiles = (e,currentFill) => {
     if(finishLineBroken){
       //set current tile to road
       mapData[r][c] = 0;
-      map.children[r].children[c].classList.remove("finish");
+      map.children[r].children[c].classList.remove("finish-up","finish-down");
       map.children[r].children[c].classList.add("road");
 
     }
@@ -121,6 +122,9 @@ const fillTiles = (e,currentFill) => {
       finishLine.row = r;
       finishLine.columnStart = c - 2;
       finishLine.columnEnd = c + 2;
+      // finishLine.direction = 
+      currentFill.value == 4 ? console.log("TOTALLY UP") : console.log("TOTALLY NOT UP");
+
 
       for(let coord of brushSizes.finish){      
         setTile({r:r+coord.r,c:c+coord.c},currentFill);
@@ -182,11 +186,12 @@ const handleTileHover = (e) => {
   const topBound = 0;
   const bottomBound = mapData.length-1;
 
-  if(currentFill.type.tileName == "finish"){
+  if(currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
 
-    let finishLineBroken = c - 2 < bottomBound || c + 2 > topBound;
+    let finishLineBroken = c - 2 < leftBound || c + 2 > rightBound;
 
     if(finishLineBroken){
+      console.log("simply busted",c - 2 < leftBound,c + 2 > rightBound, e.target.dataset)
     }
     else{
       for(let coord of brushSizes.finish){      
@@ -229,9 +234,9 @@ const handleRemoveHover = (e) => {
   const topBound = 0;
   const bottomBound = mapData.length-1;
 
-  if(currentFill.type.tileName == "finish"){
+  if(currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
 
-    let finishLineBroken = c - 2 < bottomBound || c + 2 > topBound;
+    let finishLineBroken = c - 2 < leftBound || c + 2 > rightBound;
 
     if(finishLineBroken){
         
@@ -332,9 +337,14 @@ const generateMap = (data) => {
       //spawn tile 
 
       //set tile based on value 
-      if(mapData[r][c] == 4 ){
+      if(mapData[r][c] == 5 ){
         tile.classList.add("tile");
-        tile.classList.add("finish")
+        tile.classList.add("finish-down")
+        //find finish line dimensions
+      }
+      else if(mapData[r][c] == 4 ){
+        tile.classList.add("tile");
+        tile.classList.add("finish-up")
         //find finish line dimensions
       }
       else if(mapData[r][c] == 3 ){
