@@ -72,6 +72,41 @@ const setTile = (coords, type) => {
   tile.classList.add(currentFill.type.tileName); 
 }
 
+const bucketFill = (r,c, type, current) => {
+  //If row is less than 0
+    if(r < 0){
+        return;
+    }
+
+    //If column is less than 0
+    if(c < 0){
+        return;
+    }
+
+    //If row is greater than map length
+    if(r > mapData.length - 1){
+        return;
+    }
+
+    //If column is greater than map length
+    if(c > mapData[r].length - 1){
+        return;
+    }
+
+    //If the current tile is not the type we need to swap
+    if(mapData[r][c] !== current){
+        return;
+    }
+    
+     //Update the new tpe
+     setTile({r:r,c:c},type)
+     //Fill in all four directions
+     bucketFill(r-1,c, type, current);
+     bucketFill(r+1,c, type, current);
+     bucketFill(r,c-1, type, current);
+     bucketFill(r,c+1, type, current);
+}
+
 const fillTiles = (e,currentFill) => {
   const leftBound = 0; 
   const rightBound = mapData[0].length-1;
@@ -81,8 +116,7 @@ const fillTiles = (e,currentFill) => {
   const r = parseInt(e.target.dataset.row);
   const c = parseInt(e.target.dataset.column);
 
-  //set center tile
-  setTile({r:r,c:c},currentFill);
+
 
   if(currentFill.type.tileName == "spawn"){
     //if spawn tile is already set,  and change the dom map tile class to road
@@ -155,6 +189,13 @@ const fillTiles = (e,currentFill) => {
     else{
     }
   }
+  else if(currentFill.size == "fill"){
+
+    bucketFill(r,c,currentFill,mapData[r][c]);
+  }
+
+    //set center tile
+    setTile({r:r,c:c},currentFill);
 }
 
 const handleTileFill = (method) => (e) => {
