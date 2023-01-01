@@ -124,7 +124,6 @@ const fillTiles = (e,currentFill) => {
       finishLine.columnStart = c - 2;
       finishLine.columnEnd = c + 2;
       // finishLine.direction = 
-      currentFill.value == 4 ? console.log("TOTALLY UP") : console.log("TOTALLY NOT UP");
 
 
       for(let coord of brushSizes.finish){      
@@ -137,28 +136,23 @@ const fillTiles = (e,currentFill) => {
   //brush size 2 
   else if(currentFill.size == 2){
    if(c + 1 <= rightBound && r + 1 <= bottomBound){
-     console.log("within range for fill2 ");
      for(let coord of brushSizes.brush2){      
       setTile({r:r+coord.r,c:c+coord.c},currentFill);
     }
    }
    else{
-     console.log("outside of range for fill2", r , c);
    }
   }
 
   //brush size 3 
   else if(currentFill.size == 3){
     if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound) {
-      console.log("In of range for fill3", r , c);
       for(let coord of brushSizes.brush3){      
         setTile({r:r+coord.r,c:c+coord.c},currentFill);
       }
-     console.log(fillTiles);
    }
     
     else{
-      console.log("outside of range for fill3", r , c);
     }
   }
 }
@@ -176,52 +170,47 @@ const handleTileFill = (method) => (e) => {
 }
 
 const handleTileHover = (e) => {
+  if(!painting){
+    e.target.classList.add("tile-hover")
+
+    let r = parseInt(e.target.dataset.row);
+    let c = parseInt(e.target.dataset.column);
   
-  e.target.classList.add("tile-hover")
-
-  let r = parseInt(e.target.dataset.row);
-  let c = parseInt(e.target.dataset.column);
-
-  const leftBound = 0; 
-  const rightBound = mapData[0].length-1;
-  const topBound = 0;
-  const bottomBound = mapData.length-1;
-
-  if(currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
-
-    let finishLineBroken = c - 2 < leftBound || c + 2 > rightBound;
-
-    if(finishLineBroken){
-      console.log("simply busted",c - 2 < leftBound,c + 2 > rightBound, e.target.dataset)
-    }
-    else{
-      for(let coord of brushSizes.finish){      
-        map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+    const leftBound = 0; 
+    const rightBound = mapData[0].length-1;
+    const topBound = 0;
+    const bottomBound = mapData.length-1;
+  
+    if(currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
+  
+      let finishLineBroken = c - 2 < leftBound || c + 2 > rightBound;
+  
+      if(!finishLineBroken){
+        for(let coord of brushSizes.finish){      
+          map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+        }
+      }
+      }
+    else if(currentFill.size == 2){
+      if(c + 1 <= rightBound && r + 1 <= bottomBound){
+        for(let coord of brushSizes.brush2){      
+          map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+       }
+      }
+      else{
       }
     }
-    }
-  else if(currentFill.size == 2){
-    if(c + 1 <= rightBound && r + 1 <= bottomBound){
-      console.log("within range for fill2 ");
-      for(let coord of brushSizes.brush2){      
-        map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
-     }
-    }
-    else{
-      console.log("outside of range for fill2", r , c);
+    else if(currentFill.size == 3){
+      if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
+        for(let coord of brushSizes.brush3){      
+          map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+       }
+      }
+      else{
+      }
     }
   }
-  else if(currentFill.size == 3){
-    if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
-      console.log("within range for fill2 ");
-      for(let coord of brushSizes.brush3){      
-        map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
-     }
-    }
-    else{
-      console.log("outside of range for fill2", r , c);
-    }
-  }
+
 }
 
 const handleRemoveHover = (e) => {
@@ -250,22 +239,17 @@ const handleRemoveHover = (e) => {
     }
   else if(currentFill.size == 2){
     if(c + 1 <= rightBound && r + 1 <= bottomBound){
-      console.log("within range for fill2 ");
       for(let coord of brushSizes.brush2){      
         map.children[r+coord.r].children[c+coord.c].classList.remove("tile-hover")
      }
     }
-    else{ // console.log("outside of range for fill2", r , c);
-    }
+
   }
   else if(currentFill.size == 3){
     if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
-      console.log("within range for fill2 ");
       for(let coord of brushSizes.brush3){      
         map.children[r+coord.r].children[c+coord.c].classList.remove("tile-hover")
      }
-    }
-    else{ // console.log("outside of range for fill3", r , c);
     }
   }
 
@@ -289,7 +273,6 @@ const handleUpload = (e) => {
 
 const handleMapSizeChange = (e) => {
   e.preventDefault();
-  console.log(e.target);
 
   rows = mapRow.value;
   columns = mapCol.value;
@@ -327,7 +310,6 @@ const generateMap = (data) => {
     map.removeChild(map.firstChild);
   }
 
-  console.log(mapData);
   for(let r = 0; r < mapData.length; r++){
     let row = document.createElement("div");
     row.classList.add("row");
