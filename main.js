@@ -35,13 +35,7 @@ let spawnTile =
   column:8,
   element : null
 }
-let finishLine = 
-{
-  type:tileTypes[4],  
-  row: null,
-  columnStart: null,
-  columnEnd: null
-}
+
 let spawnElement;
 let newRow;
 let newColumn;
@@ -130,18 +124,6 @@ const fillTiles = (e,currentFill) => {
   }
 
   else if (currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
-    //if finish line is set, remove it from mapData, and change the Old finish line tiles to road.
-    if(finishLine.row != null && finishLine.columnStart != null && finishLine.columnEnd != null){
-      
-      for(let cs = finishLine.columnStart; cs <= finishLine.columnEnd; cs++){
-        mapData[finishLine.row][cs] = 0; // road
-        map.children[finishLine.row].children[cs].classList.remove("finish-up","finish-down");
-        map.children[finishLine.row].children[cs].classList.add("road");
-      }
-    }
-    else{
-      //no finish line yet. 
-    }
   
     const finishLineBroken = c - 2 < leftBound || c + 2 > rightBound; //total size of 5
 
@@ -153,11 +135,7 @@ const fillTiles = (e,currentFill) => {
 
     }
     else{
-      // set finish line 
-      finishLine.row = r;
-      finishLine.columnStart = c - 2;
-      finishLine.columnEnd = c + 2;
-      // finishLine.direction = 
+
 
 
       for(let coord of brushSizes.finish){      
