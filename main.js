@@ -311,7 +311,8 @@ const generateDefaultMapData = (rows,columns) => {
         mapRow.push(3); //spawn 
       }
       else{
-        mapRow.push(0); // road
+        // mapRow.push(0); // road
+        mapRow.push(2); //dirt
       }
     }
     primativeMapData.push(mapRow);
