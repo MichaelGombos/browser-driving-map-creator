@@ -370,6 +370,10 @@ const generateMap = (data) => {
       if(mapData[r][c] >= 0 && mapData[r][c] <= tileTypes.length){
         tile.classList.add("tile");
         tile.classList.add(tileTypes[mapData[r][c]].tileName)
+        if(mapData[r][c] == 3)
+        {
+          spawnTile.element = tile;
+        }
       }
 
       tile.addEventListener("mouseover",handleTileFill("drag"))
