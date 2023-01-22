@@ -50,14 +50,24 @@ body{
 
 
 #paints{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top:30px;
+  gap:10px;
+}
+
+#paints div{
   display:flex;
   flex-direction:row;
   gap:20px;
 }
+#paints div h3{
+  margin: 0;
+}
 
 .paint-tile{
-  width:50px;
-  height:50px;
+  width:20px;
+  height:20px;
   /* background-color:red; */
 }
 
@@ -85,6 +95,20 @@ body{
 
 .bumper{
   background-color:#0027d2;
+}
+
+.check-point-right-road{
+  background-color:rgb(187, 187, 187);
+}
+.check-point-right-dirt{
+  background-color:rgb(216, 216, 216);
+}
+
+.check-point-left-road{
+  background-color:rgb(78, 135, 162);
+}
+.check-point-left-dirt{
+  background-color:rgb(72, 183, 216);
 }
 #map-size{
   display:flex;

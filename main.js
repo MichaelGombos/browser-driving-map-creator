@@ -1,11 +1,15 @@
 const tileTypes = [
-  {  tileName:"road",    color:"orange",  colorHex:"#FFA500",  value:0},
-  {  tileName:"wall",    color: "red",    colorHex:"#FF0000",  value:1},
-  {  tileName:"dirt",    color:"brown",   colorHex:"#964B00",  value:2},  
-  {  tileName:"spawn",    color: "cyan",    colorHex:"#71c9ff", value:3},
-  { tileName:"finish-up", color:"green", colorHex:"#73ff71", value:4},
-  { tileName:"finish-down", color:"pink", colorHex:"#ff29e2", value:5},
-  { tileName:"bumper", color:"blue", colorHex:"#0027d2", value:6}
+  {  tileName:"road",   value:0},
+  {  tileName:"wall", value:1},
+  {  tileName:"dirt",  value:2},  
+  {  tileName:"spawn", value:3},
+  { tileName:"finish-up", value:4},
+  { tileName:"finish-down", value:5},
+  { tileName:"bumper",  value:6},
+  { tileName:"check-point-left-road",  value:7},
+  { tileName:"check-point-right-road",  value:8},
+  { tileName:"check-point-left-dirt", value:9},
+  { tileName:"check-point-right-dirt", value:10},
 ]
 const mapCol = document.querySelector("#cols");
 const mapRow = document.querySelector("#rows");
@@ -45,6 +49,9 @@ let brushSizes = //each brush size is an array of coord objects
   finish: [
     {r:0, c:-2}, { r:0, c:-1 },{ r:0,  c:0 }, { r:0 , c:1} , {r:0, c:2}
   ],
+  checkPoint: [
+    {r:-2, c:0}, { r:-1, c:0 },{ r:0,  c:0 }, { r:1 , c:0} , {r:2, c:0}
+  ],
   brush1: [
     {r:0,c:0}
   ],
@@ -60,10 +67,11 @@ const setTile = (coords, type) => {
 
   mapData[coords.r][coords.c] = currentFill.type.value;
   let tile = map.children[coords.r].children[coords.c];
-
   // //remove all classes from selected tile , then add 
-  tile.classList.remove("road","dirt","wall","spawn","finish-up","finish-down","bumper");
-  tile.classList.add(currentFill.type.tileName); 
+  for(let className of tileTypes.map(x => x.tileName)){
+    tile.classList.remove(className);
+  }
+  tile.classList.add(type.type.tileName); 
 }
 
 const bucketFill = (r,c, type, current) => {
@@ -123,6 +131,28 @@ const fillTiles = (e,currentFill) => {
 
   }
 
+
+  else if (currentFill.type.tileName == "check-point-left-road" ||
+   currentFill.type.tileName == "check-point-right-road" ||
+   currentFill.type.tileName == "check-point-left-dirt" ||
+   currentFill.type.tileName == "check-point-right-dirt"  ){
+  
+    const checkPointLineBroken = r - 2 < topBound || r + 2 > bottomBound; //total size of 5
+
+    if(checkPointLineBroken){
+      //set current tile to road
+      mapData[r][c] = 0;
+      map.children[r].children[c].classList.remove("finish-up","finish-down");
+      map.children[r].children[c].classList.add("road");
+    }
+    else{
+      for(let coord of brushSizes.checkPoint){      
+        setTile({r:r+coord.r,c:c+coord.c},currentFill);
+      }
+    }
+   
+  }
+
   else if (currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
   
     const finishLineBroken = c - 2 < leftBound || c + 2 > rightBound; //total size of 5
@@ -135,9 +165,6 @@ const fillTiles = (e,currentFill) => {
 
     }
     else{
-
-
-
       for(let coord of brushSizes.finish){      
         setTile({r:r+coord.r,c:c+coord.c},currentFill);
       }
@@ -340,37 +367,9 @@ const generateMap = (data) => {
       //spawn tile 
 
       //set tile based on value 
-      if(mapData[r][c] == 6 ){
+      if(mapData[r][c] > 0 && mapData[r][c] < tileTypes.length){
         tile.classList.add("tile");
-        tile.classList.add("bumper")
-        //find finish line dimensions
-      }
-      if(mapData[r][c] == 5 ){
-        tile.classList.add("tile");
-        tile.classList.add("finish-down")
-        //find finish line dimensions
-      }
-      else if(mapData[r][c] == 4 ){
-        tile.classList.add("tile");
-        tile.classList.add("finish-up")
-        //find finish line dimensions
-      }
-      else if(mapData[r][c] == 3 ){
-        tile.classList.add("tile");
-        tile.classList.add("spawn")
-        spawnTile.element = tile;
-      }
-      else if(mapData[r][c] == 2 ){
-        tile.classList.add("tile");
-        tile.classList.add("dirt")
-      }
-      else if(mapData[r][c] == 1 ){
-        tile.classList.add("tile");
-        tile.classList.add("wall")
-      }
-      else if(mapData[r][c] == 0 ){
-          tile.classList.add("tile");
-          tile.classList.add("road")
+        tile.classList.add(tileTypes[mapData[r][c]].tileName)
       }
 
       tile.addEventListener("mouseover",handleTileFill("drag"))
@@ -400,8 +399,9 @@ for(let type of tileTypes){
   paintTile.dataset.name = type.tileName;
   paintTile.addEventListener("click",handleTypeChange(type));
   
-  paint.appendChild(paintHeader);
   paint.appendChild(paintTile);
+  paint.appendChild(paintHeader);
+
 
   paints.appendChild(paint);
 
