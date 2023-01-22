@@ -367,7 +367,7 @@ const generateMap = (data) => {
       //spawn tile 
 
       //set tile based on value 
-      if(mapData[r][c] > 0 && mapData[r][c] < tileTypes.length){
+      if(mapData[r][c] >= 0 && mapData[r][c] <= tileTypes.length){
         tile.classList.add("tile");
         tile.classList.add(tileTypes[mapData[r][c]].tileName)
       }
