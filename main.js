@@ -27,8 +27,8 @@ let mapData = [];
 let flatMapData = [];
 let length_of_row = 0;
 
-let rows = 20;
-let columns = 20;
+let rows = 150;
+let columns = 150;
 let currentFill = {
   type : tileTypes.find(t => t.tileName == "wall"),
   size : 1
@@ -353,6 +353,8 @@ const generateDefaultMapData = (rows,columns) => {
 }
 const generateMap = (data) => {
   mapData = data;
+  rows = mapData.length;
+  columns = mapData[0].length;
   length_of_row = data[0].length;
   // flatMapData = mapData.flat();
   // flatWidth = mapData.length;
@@ -385,8 +387,8 @@ const generateMap = (data) => {
 
       tile.addEventListener("mouseover",handleTileFill("drag"))
       tile.addEventListener("click",handleTileFill("point"))
-      tile.addEventListener("mouseover", handleTileHover)
-      tile.addEventListener("mouseout", handleRemoveHover)
+      // tile.addEventListener("mouseover", handleTileHover)
+      // tile.addEventListener("mouseout", handleRemoveHover)
       map.appendChild(tile);
     }
   }
