@@ -8,15 +8,15 @@ body{
 }
 
 .map-container{
-  width:auto;
-  height:100%;
+  width:500px;
+  height:auto;
 }
 #map{
-  display:flex;
-  flex-direction:column;
-  width:auto;
+  display:grid;
   height:100%;
-
+  width:100%;
+  /* grid-template-columns: repeat(100, 1fr);
+  grid-template-rows: repeat(40, 1fr); */
   background-color:rgb(100, 100, 100);
 }
 .row{
@@ -30,8 +30,9 @@ body{
 }
 
 .tile{
-  width:10px;
-  height:10px;
+  aspect-ratio: 1/1;
+  width:100%;
+  height:auto;
   background-color:blue;
   outline: 1px solid rgba(255, 255, 255, 0);
   z-index: 0;

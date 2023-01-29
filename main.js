@@ -24,6 +24,8 @@ const mapInput = document.querySelector("#map-input")
 const brushSizeSelect = document.querySelector("#brush-size-select")
 
 let mapData = [];
+let flatMapData = [];
+let length_of_row = 0;
 
 let rows = 20;
 let columns = 20;
@@ -64,9 +66,10 @@ let brushSizes = //each brush size is an array of coord objects
 }
 
 const setTile = (coords, type) => {
-
+  // oneDindex = (row * length_of_row) + column; 
   mapData[coords.r][coords.c] = currentFill.type.value;
-  let tile = map.children[coords.r].children[coords.c];
+  
+  let tile = map.children[(coords.r * length_of_row) + coords.c ] ;
   // //remove all classes from selected tile , then add 
   for(let className of tileTypes.map(x => x.tileName)){
     tile.classList.remove(className);
@@ -233,14 +236,14 @@ const handleTileHover = (e) => {
   
       if(!finishLineBroken){
         for(let coord of brushSizes.finish){      
-          map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+          map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.add("tile-hover")
         }
       }
       }
     else if(currentFill.size == 2){
       if(c + 1 <= rightBound && r + 1 <= bottomBound){
         for(let coord of brushSizes.brush2){      
-          map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+          map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.add("tile-hover")
        }
       }
       else{
@@ -249,7 +252,7 @@ const handleTileHover = (e) => {
     else if(currentFill.size == 3){
       if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
         for(let coord of brushSizes.brush3){      
-          map.children[r+coord.r].children[c+coord.c].classList.add("tile-hover")
+          map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.add("tile-hover")
        }
       }
       else{
@@ -279,14 +282,14 @@ const handleRemoveHover = (e) => {
     }
     else{
       for(let coord of brushSizes.finish){      
-        map.children[r+coord.r].children[c+coord.c].classList.remove("tile-hover")
+        map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.remove("tile-hover")      
       }
     }
     }
   else if(currentFill.size == 2){
     if(c + 1 <= rightBound && r + 1 <= bottomBound){
       for(let coord of brushSizes.brush2){      
-        map.children[r+coord.r].children[c+coord.c].classList.remove("tile-hover")
+        map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.remove("tile-hover")
      }
     }
 
@@ -294,7 +297,7 @@ const handleRemoveHover = (e) => {
   else if(currentFill.size == 3){
     if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
       for(let coord of brushSizes.brush3){      
-        map.children[r+coord.r].children[c+coord.c].classList.remove("tile-hover")
+        map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.remove("tile-hover")
      }
     }
   }
@@ -350,15 +353,19 @@ const generateDefaultMapData = (rows,columns) => {
 }
 const generateMap = (data) => {
   mapData = data;
-  
+  length_of_row = data[0].length;
+  // flatMapData = mapData.flat();
+  // flatWidth = mapData.length;
+  //  oneDindex = (row * length_of_row) + column; 
+  map.style.gridTemplateRows = `repeat(${rows}, 1fr)`
+  map.style.gridTemplateColumns = `repeat(${columns}, 1fr)`
+
   //clear map
   while(map.firstChild){
     map.removeChild(map.firstChild);
   }
 
   for(let r = 0; r < mapData.length; r++){
-    let row = document.createElement("div");
-    row.classList.add("row");
     for(let c = 0; c < mapData[0].length; c++){
       let tile = document.createElement("div")
       tile.dataset.row = r;
@@ -380,9 +387,8 @@ const generateMap = (data) => {
       tile.addEventListener("click",handleTileFill("point"))
       tile.addEventListener("mouseover", handleTileHover)
       tile.addEventListener("mouseout", handleRemoveHover)
-      row.appendChild(tile);
+      map.appendChild(tile);
     }
-    map.appendChild(row);
   }
 
 }
