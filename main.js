@@ -1,15 +1,15 @@
 const tileTypes = [
-  {  tileName:"road",   value:0},
-  {  tileName:"wall", value:1},
-  {  tileName:"dirt",  value:2},  
-  {  tileName:"spawn", value:3},
-  { tileName:"finish-up", value:4},
-  { tileName:"finish-down", value:5},
-  { tileName:"bumper",  value:6},
-  { tileName:"check-point-left-road",  value:7},
-  { tileName:"check-point-right-road",  value:8},
-  { tileName:"check-point-left-dirt", value:9},
-  { tileName:"check-point-right-dirt", value:10},
+  {  tileName:"road",   value:0 , color: "#e69c69"},
+  {  tileName:"wall", value:1, color: "#8a4836"},
+  {  tileName:"dirt",  value:2, color : "#bf6f4a"},  
+  {  tileName:"spawn", value:3, color: "#71c9ff"},
+  { tileName:"finish-up", value:4, color: "#73ff71"},
+  { tileName:"finish-down", value:5, color: "#ff29e2"},
+  { tileName:"bumper",  value:6, color:  "#0027d2"},
+  { tileName:"check-point-left-road",  value:7, color: "#e69c69"},
+  { tileName:"check-point-right-road",  value:8, color: "#e69c69"},
+  { tileName:"check-point-left-dirt", value:9, color: "#bf6f4a"},
+  { tileName:"check-point-right-dirt", value:10 ,color: "#bf6f4a"},
 ]
 const mapCol = document.querySelector("#cols");
 const mapRow = document.querySelector("#rows");
@@ -22,6 +22,12 @@ const result = document.querySelector("#result");
 const uploadButton = document.querySelector("#upload");
 const mapInput = document.querySelector("#map-input")
 const brushSizeSelect = document.querySelector("#brush-size-select")
+
+const canvasMap = document.querySelector("canvas");
+
+
+const context = canvasMap.getContext("2d");
+
 
 let mapData = [];
 let flatMapData = [];
@@ -65,16 +71,33 @@ let brushSizes = //each brush size is an array of coord objects
   ]
 }
 
-const setTile = (coords, type) => {
-  // oneDindex = (row * length_of_row) + column; 
-  mapData[coords.r][coords.c] = currentFill.type.value;
+const generateCanvasMapColor = (canvas,data) => {
+  mapData = data;
+  rows = mapData.length;
+  columns = mapData[0].length;
+  length_of_row = data[0].length;
   
-  let tile = map.children[(coords.r * length_of_row) + coords.c ] ;
-  // //remove all classes from selected tile , then add 
-  for(let className of tileTypes.map(x => x.tileName)){
-    tile.classList.remove(className);
+  canvas.width = mapData[0].length;
+  canvas.height = mapData.length;
+
+  context.globalCompositeOperation='destination-over';
+  for(let rowIndex in mapData){
+    for(let cellIndex in mapData[rowIndex]){
+      context.fillStyle =tileTypes[mapData[rowIndex][cellIndex]].color;
+      context.fillRect(cellIndex,rowIndex,1,1);
+    }
   }
-  tile.classList.add(type.type.tileName); 
+  context.globalCompositeOperation='source-over';
+}
+
+const setTile = (coords, type, modifier = 1) => {
+  //updates mapData, and draws tile on canvas.
+  console.log(type)
+  mapData[coords.r][coords.c] = type.value;
+  console.log(mapData[coords.r][coords.c]);
+
+  context.fillStyle = type.color;
+  context.fillRect(coords.c,coords.r,modifier,modifier);
 }
 
 const bucketFill = (r,c, type, current) => {
@@ -112,25 +135,22 @@ const bucketFill = (r,c, type, current) => {
      bucketFill(r,c+1, type, current);
 }
 
-const fillTiles = (e,currentFill) => {
+const fillTiles = (c,r,currentFill) => {
   const leftBound = 0; 
   const rightBound = mapData[0].length-1;
   const topBound = 0;
   const bottomBound = mapData.length-1;
 
-  const r = parseInt(e.target.dataset.row);
-  const c = parseInt(e.target.dataset.column);
-
 
   switch(true) {
     case (currentFill.type.tileName == "spawn"):
       //if spawn tile is already set,  and change the dom map tile class to road
-      spawnTile.element.classList.remove("spawn");
-      spawnTile.element.classList.add("road");
-      mapData[spawnTile.element.dataset.row][spawnTile.element.dataset.column] = 0; //road
+      setTile({r:spawnTile.row,c:spawnTile.column}, tileTypes[0])
+      // spawnTile.element.classList.remove("spawn");
+      // spawnTile.element.classList.add("road");
 
-      //set spawn element again
-      spawnTile.element = e.target;
+      spawnTile.row = r;
+      spawnTile.column = c;
       break;
     case (currentFill.type.tileName == "check-point-left-road" ||
     currentFill.type.tileName == "check-point-right-road" ||
@@ -140,13 +160,11 @@ const fillTiles = (e,currentFill) => {
 
       if(checkPointLineBroken){
         //set current tile to road
-        mapData[r][c] = 0;
-        map.children[r].children[c].classList.remove("finish-up","finish-down");
-        map.children[r].children[c].classList.add("road");
+        setTile({r:r,c:c}, tileTypes[0])
       }
       else{
         for(let coord of brushSizes.checkPoint){      
-          setTile({r:r+coord.r,c:c+coord.c},currentFill);
+          setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
         }
       }
       break;
@@ -155,28 +173,25 @@ const fillTiles = (e,currentFill) => {
 
       if(finishLineBroken){
         //set current tile to road
-        mapData[r][c] = 0;
-        map.children[r].children[c].classList.remove("finish-up","finish-down");
-        map.children[r].children[c].classList.add("road");
-  
+        setTile({r:r,c:c}, tileTypes[0])
       }
       else{
         for(let coord of brushSizes.finish){      
-          setTile({r:r+coord.r,c:c+coord.c},currentFill);
+          setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
         }
       }
       break;
     case (currentFill.size == 2):
       if(c + 1 <= rightBound && r + 1 <= bottomBound){
         for(let coord of brushSizes.brush2){      
-         setTile({r:r+coord.r,c:c+coord.c},currentFill);
+         setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
        }
       }
       break;
     case (currentFill.size == 3):
       if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound) {
         for(let coord of brushSizes.brush3){      
-          setTile({r:r+coord.r,c:c+coord.c},currentFill);
+          setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
         }
      }
       break;
@@ -185,7 +200,7 @@ const fillTiles = (e,currentFill) => {
       break;
   }
       //set center tile
-      setTile({r:r,c:c},currentFill);
+      setTile({r:r,c:c},currentFill.type);
 
 }
 
@@ -201,92 +216,6 @@ const handleTileFill = (method) => (e) => {
   }
 }
 
-const handleTileHover = (e) => {
-  if(!painting){
-    e.target.classList.add("tile-hover")
-
-    let r = parseInt(e.target.dataset.row);
-    let c = parseInt(e.target.dataset.column);
-  
-    const leftBound = 0; 
-    const rightBound = mapData[0].length-1;
-    const topBound = 0;
-    const bottomBound = mapData.length-1;
-  
-    if(currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
-  
-      let finishLineBroken = c - 2 < leftBound || c + 2 > rightBound;
-  
-      if(!finishLineBroken){
-        for(let coord of brushSizes.finish){      
-          map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.add("tile-hover")
-        }
-      }
-      }
-    else if(currentFill.size == 2){
-      if(c + 1 <= rightBound && r + 1 <= bottomBound){
-        for(let coord of brushSizes.brush2){      
-          map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.add("tile-hover")
-       }
-      }
-      else{
-      }
-    }
-    else if(currentFill.size == 3){
-      if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
-        for(let coord of brushSizes.brush3){      
-          map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.add("tile-hover")
-       }
-      }
-      else{
-      }
-    }
-  }
-
-}
-
-const handleRemoveHover = (e) => {
-  e.target.classList.remove("tile-hover");
-
-  let r = parseInt(e.target.dataset.row);
-  let c = parseInt(e.target.dataset.column);
-
-  const leftBound = 0; 
-  const rightBound = mapData[0].length-1;
-  const topBound = 0;
-  const bottomBound = mapData.length-1;
-
-  if(currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
-
-    let finishLineBroken = c - 2 < leftBound || c + 2 > rightBound;
-
-    if(finishLineBroken){
-        
-    }
-    else{
-      for(let coord of brushSizes.finish){      
-        map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.remove("tile-hover")      
-      }
-    }
-    }
-  else if(currentFill.size == 2){
-    if(c + 1 <= rightBound && r + 1 <= bottomBound){
-      for(let coord of brushSizes.brush2){      
-        map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.remove("tile-hover")
-     }
-    }
-
-  }
-  else if(currentFill.size == 3){
-    if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound){
-      for(let coord of brushSizes.brush3){      
-        map.children[((r + coord.r) * length_of_row) + c + coord.c ].classList.remove("tile-hover")
-     }
-    }
-  }
-
-}
-
 const handleTypeChange = (type) => (e) => {
   currentFill.type = type;
 }
@@ -300,7 +229,7 @@ const handlePrint = (e) => {
 }
 
 const handleUpload = (e) => {
-  generateMap(JSON.parse("[" + mapInput.value + "]")[0])
+  generateCanvasMapColor(canvasMap, JSON.parse("[" + mapInput.value + "]")[0])
 }
 
 const handleMapSizeChange = (e) => {
@@ -309,13 +238,35 @@ const handleMapSizeChange = (e) => {
   rows = mapRow.value;
   columns = mapCol.value;
 
-  generateMap(generateDefaultMapData(rows,columns));
+  generateCanvasMapColor(canvasMap, generateDefaultMapData(rows,columns))
 }
 
+const handleCanvasMouseMovement = (e) => {
+  if(painting){
+    console.log(getMousePos(canvasMap,e));
+    const pos = getMousePos(canvasMap,e)
+    const posx = Math.floor(pos.x);
+    const posy = Math.floor(pos.y);
+    fillTiles(posx,posy,currentFill)
+  }
+}
 
+const handleCanvasMouseClick = (e) => {
+  console.log(getMousePos(canvasMap,e));
+  const pos = getMousePos(canvasMap,e)
+  const posx = Math.floor(pos.x);
+  const posy = Math.floor(pos.y);
+  fillTiles(posx,posy,currentFill)
+}
 
-//TODO -- seperate
-//generate domMap and mapdata
+function getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+      x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+      y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+  };
+}
+
 const generateDefaultMapData = (rows,columns) => {
   let primativeMapData = [];
 
@@ -334,51 +285,8 @@ const generateDefaultMapData = (rows,columns) => {
   }
   return primativeMapData;
 }
-const generateMap = (data) => {
-  mapData = data;
-  rows = mapData.length;
-  columns = mapData[0].length;
-  length_of_row = data[0].length;
-  // flatMapData = mapData.flat();
-  // flatWidth = mapData.length;
-  //  oneDindex = (row * length_of_row) + column; 
-  map.style.gridTemplateRows = `repeat(${rows}, 1fr)`
-  map.style.gridTemplateColumns = `repeat(${columns}, 1fr)`
 
-  //clear map
-  while(map.firstChild){
-    map.removeChild(map.firstChild);
-  }
-
-  for(let r = 0; r < mapData.length; r++){
-    for(let c = 0; c < mapData[0].length; c++){
-      let tile = document.createElement("div")
-      tile.dataset.row = r;
-      tile.dataset.column = c;
-
-      //spawn tile 
-
-      //set tile based on value 
-      if(mapData[r][c] >= 0 && mapData[r][c] <= tileTypes.length){
-        tile.classList.add("tile");
-        tile.classList.add(tileTypes[mapData[r][c]].tileName)
-        if(mapData[r][c] == 3)
-        {
-          spawnTile.element = tile;
-        }
-      }
-
-      tile.addEventListener("mouseover",handleTileFill("drag"))
-      tile.addEventListener("click",handleTileFill("point"))
-      // tile.addEventListener("mouseover", handleTileHover)
-      // tile.addEventListener("mouseout", handleRemoveHover)
-      map.appendChild(tile);
-    }
-  }
-
-}
-
-generateMap(generateDefaultMapData(rows,columns));
+generateCanvasMapColor(canvasMap, generateDefaultMapData(rows,columns))
 
 //display tiles 
 for(let type of tileTypes){
@@ -412,3 +320,6 @@ document.addEventListener("mouseup", () => painting = false);
 
 mapSizeSubmit.addEventListener("click",handleMapSizeChange);
 brushSizeSelect.addEventListener("change", handleBrushSizeChange);
+
+canvasMap.addEventListener("mousemove", handleCanvasMouseMovement)
+canvasMap.addEventListener("click", handleCanvasMouseClick)
