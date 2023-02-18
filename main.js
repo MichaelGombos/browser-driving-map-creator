@@ -122,88 +122,71 @@ const fillTiles = (e,currentFill) => {
   const c = parseInt(e.target.dataset.column);
 
 
+  switch(true) {
+    case (currentFill.type.tileName == "spawn"):
+      //if spawn tile is already set,  and change the dom map tile class to road
+      spawnTile.element.classList.remove("spawn");
+      spawnTile.element.classList.add("road");
+      mapData[spawnTile.element.dataset.row][spawnTile.element.dataset.column] = 0; //road
 
-  if(currentFill.type.tileName == "spawn"){
-    //if spawn tile is already set,  and change the dom map tile class to road
-    spawnTile.element.classList.remove("spawn");
-    spawnTile.element.classList.add("road");
-    mapData[spawnTile.element.dataset.row][spawnTile.element.dataset.column] = 0; //road
+      //set spawn element again
+      spawnTile.element = e.target;
+      break;
+    case (currentFill.type.tileName == "check-point-left-road" ||
+    currentFill.type.tileName == "check-point-right-road" ||
+    currentFill.type.tileName == "check-point-left-dirt" ||
+    currentFill.type.tileName == "check-point-right-dirt" ):
+      const checkPointLineBroken = r - 2 < topBound || r + 2 > bottomBound; //total size of 5
 
-    //set spawn element again
-    spawnTile.element = e.target;
+      if(checkPointLineBroken){
+        //set current tile to road
+        mapData[r][c] = 0;
+        map.children[r].children[c].classList.remove("finish-up","finish-down");
+        map.children[r].children[c].classList.add("road");
+      }
+      else{
+        for(let coord of brushSizes.checkPoint){      
+          setTile({r:r+coord.r,c:c+coord.c},currentFill);
+        }
+      }
+      break;
+    case (currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"):
+      const finishLineBroken = c - 2 < leftBound || c + 2 > rightBound; //total size of 5
 
-  }
-
-
-  else if (currentFill.type.tileName == "check-point-left-road" ||
-   currentFill.type.tileName == "check-point-right-road" ||
-   currentFill.type.tileName == "check-point-left-dirt" ||
-   currentFill.type.tileName == "check-point-right-dirt"  ){
+      if(finishLineBroken){
+        //set current tile to road
+        mapData[r][c] = 0;
+        map.children[r].children[c].classList.remove("finish-up","finish-down");
+        map.children[r].children[c].classList.add("road");
   
-    const checkPointLineBroken = r - 2 < topBound || r + 2 > bottomBound; //total size of 5
-
-    if(checkPointLineBroken){
-      //set current tile to road
-      mapData[r][c] = 0;
-      map.children[r].children[c].classList.remove("finish-up","finish-down");
-      map.children[r].children[c].classList.add("road");
-    }
-    else{
-      for(let coord of brushSizes.checkPoint){      
-        setTile({r:r+coord.r,c:c+coord.c},currentFill);
       }
-    }
-   
-  }
-
-  else if (currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"){
-  
-    const finishLineBroken = c - 2 < leftBound || c + 2 > rightBound; //total size of 5
-
-    if(finishLineBroken){
-      //set current tile to road
-      mapData[r][c] = 0;
-      map.children[r].children[c].classList.remove("finish-up","finish-down");
-      map.children[r].children[c].classList.add("road");
-
-    }
-    else{
-      for(let coord of brushSizes.finish){      
-        setTile({r:r+coord.r,c:c+coord.c},currentFill);
+      else{
+        for(let coord of brushSizes.finish){      
+          setTile({r:r+coord.r,c:c+coord.c},currentFill);
+        }
       }
-    }
-   
-  }
-
-  //brush size 2 
-  else if(currentFill.size == 2){
-   if(c + 1 <= rightBound && r + 1 <= bottomBound){
-     for(let coord of brushSizes.brush2){      
-      setTile({r:r+coord.r,c:c+coord.c},currentFill);
-    }
-   }
-   else{
-   }
-  }
-
-  //brush size 3 
-  else if(currentFill.size == 3){
-    if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound) {
-      for(let coord of brushSizes.brush3){      
-        setTile({r:r+coord.r,c:c+coord.c},currentFill);
+      break;
+    case (currentFill.size == 2):
+      if(c + 1 <= rightBound && r + 1 <= bottomBound){
+        for(let coord of brushSizes.brush2){      
+         setTile({r:r+coord.r,c:c+coord.c},currentFill);
+       }
       }
-   }
-    
-    else{
-    }
+      break;
+    case (currentFill.size == 3):
+      if(c - 1 >= leftBound && c + 1 <= rightBound && r - 1 > topBound && r + 1 < bottomBound) {
+        for(let coord of brushSizes.brush3){      
+          setTile({r:r+coord.r,c:c+coord.c},currentFill);
+        }
+     }
+      break;
+    case (currentFill.size == "fill"):
+      bucketFill(r,c,currentFill,mapData[r][c]);
+      break;
   }
-  else if(currentFill.size == "fill"){
+      //set center tile
+      setTile({r:r,c:c},currentFill);
 
-    bucketFill(r,c,currentFill,mapData[r][c]);
-  }
-
-    //set center tile
-    setTile({r:r,c:c},currentFill);
 }
 
 const handleTileFill = (method) => (e) => {
