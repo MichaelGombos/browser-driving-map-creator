@@ -6,10 +6,10 @@ const tileTypes = [
   { tileName:"finish-up", value:4, color: "#73ff71"},
   { tileName:"finish-down", value:5, color: "#ff29e2"},
   { tileName:"bumper",  value:6, color:  "#0027d2"},
-  { tileName:"check-point-left-road",  value:7, color: "rgb(78, 135, 162)"},
-  { tileName:"check-point-right-road",  value:8, color: "rgb(187, 187, 187)"},
-  { tileName:"check-point-left-dirt", value:9, color: "rgb(72, 183, 216)"},
-  { tileName:"check-point-right-dirt", value:10 ,color: "rgb(216, 216, 216)"},
+  { tileName:"check-point-l-road",  value:7, color: "rgb(78, 135, 162)"},
+  { tileName:"check-point-r-road",  value:8, color: "rgb(187, 187, 187)"},
+  { tileName:"check-point-l-dirt", value:9, color: "rgb(72, 183, 216)"},
+  { tileName:"check-point-r-dirt", value:10 ,color: "rgb(216, 216, 216)"},
 ]
 const mapCol = document.querySelector("#cols");
 const mapRow = document.querySelector("#rows");
@@ -17,11 +17,11 @@ const mapSizeSubmit = document.querySelector("#map-size-submit");
 
 const map = document.querySelector("#map");
 const paints = document.querySelector("#paints");
-const printButton = document.querySelector("#print");
-const result = document.querySelector("#result");
+
 const uploadButton = document.querySelector("#upload");
 const mapInput = document.querySelector("#map-input")
 const brushSizeSelect = document.querySelector("#brush-size-select")
+const copyToClipboardButton = document.querySelector("#copy-to-clipboard");
 
 const canvasMap = document.querySelector("canvas");
 
@@ -71,6 +71,12 @@ let brushSizes = //each brush size is an array of coord objects
   ]
 }
 
+const copyToClipboard = str => {
+  if (navigator && navigator.clipboard && navigator.clipboard.writeText)
+    return navigator.clipboard.writeText(str);
+  return Promise.reject('The Clipboard API is not available.');
+};
+
 const generateCanvasMapColor = (canvas,data) => {
   mapData = data;
   rows = mapData.length;
@@ -92,9 +98,7 @@ const generateCanvasMapColor = (canvas,data) => {
 
 const setTile = (coords, type, modifier = 1) => {
   //updates mapData, and draws tile on canvas.
-  console.log(type)
   mapData[coords.r][coords.c] = type.value;
-  console.log(mapData[coords.r][coords.c]);
 
   context.fillStyle = type.color;
   context.fillRect(coords.c,coords.r,modifier,modifier);
@@ -152,10 +156,10 @@ const fillTiles = (c,r,currentFill) => {
       spawnTile.row = r;
       spawnTile.column = c;
       break;
-    case (currentFill.type.tileName == "check-point-left-road" ||
-    currentFill.type.tileName == "check-point-right-road" ||
-    currentFill.type.tileName == "check-point-left-dirt" ||
-    currentFill.type.tileName == "check-point-right-dirt" ):
+    case (currentFill.type.tileName == "check-point-l-road" ||
+    currentFill.type.tileName == "check-point-r-road" ||
+    currentFill.type.tileName == "check-point-l-dirt" ||
+    currentFill.type.tileName == "check-point-r-dirt" ):
       const checkPointLineBroken = r - 2 < topBound || r + 2 > bottomBound; //total size of 5
 
       if(checkPointLineBroken){
@@ -196,7 +200,7 @@ const fillTiles = (c,r,currentFill) => {
      }
       break;
     case (currentFill.size == "fill"):
-      bucketFill(r,c,currentFill,mapData[r][c]);
+      bucketFill(r,c,currentFill.type,mapData[r][c]);
       break;
   }
       //set center tile
@@ -224,8 +228,11 @@ const handleBrushSizeChange = (e) => {
   currentFill.size =  e.target.value;
 }
 
-const handlePrint = (e) => {
-  result.innerHTML = "[" + mapData.map(mapRow => "\n[" + mapRow.map(cell => cell ) + "]") + "\n]";
+
+const handleCopy = (e) => {
+  let arrayString = "[" + mapData.map(mapRow => "\n[" + mapRow.map(cell => cell ) + "]") + "\n]";
+
+  copyToClipboard(arrayString);
 }
 
 const handleUpload = (e) => {
@@ -243,7 +250,6 @@ const handleMapSizeChange = (e) => {
 
 const handleCanvasMouseMovement = (e) => {
   if(painting){
-    console.log(getMousePos(canvasMap,e));
     const pos = getMousePos(canvasMap,e)
     const posx = Math.floor(pos.x);
     const posy = Math.floor(pos.y);
@@ -252,7 +258,6 @@ const handleCanvasMouseMovement = (e) => {
 }
 
 const handleCanvasMouseClick = (e) => {
-  console.log(getMousePos(canvasMap,e));
   const pos = getMousePos(canvasMap,e)
   const posx = Math.floor(pos.x);
   const posy = Math.floor(pos.y);
@@ -292,10 +297,11 @@ generateCanvasMapColor(canvasMap, generateDefaultMapData(rows,columns))
 for(let type of tileTypes){
   let paint = document.createElement("div")
 
-  let paintHeader = document.createElement("h3");
+  let paintHeader = document.createElement("p");
   let paintTile = document.createElement("div");
 
   paintHeader.innerText = type.tileName;
+  paintHeader.classList.add("paint-header")
 
   paintTile.classList.add("paint-tile")
   paintTile.classList.add(type.tileName)
@@ -312,8 +318,9 @@ for(let type of tileTypes){
   
 }
 
-printButton.addEventListener("click",handlePrint)
+
 uploadButton.addEventListener("click",handleUpload);
+copyToClipboardButton.addEventListener("click", handleCopy)
 
 document.addEventListener("mousedown", () => painting = true)
 document.addEventListener("mouseup", () => painting = false);

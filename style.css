@@ -1,60 +1,123 @@
+@font-face {
+  font-family: 'NESCyrillic';
+  src: url('./fonts/NESCyrillic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DisrespectfulTee';
+  src: url('./fonts/DisrespectfulTee.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root{
+  --shade-100: #3e3e3e;
+  --shade-0: #ffffff;
+  --primary-50: #fdf8f1;
+  --primary-100: #f9e6cf;
+  --primary-300: #f6ca9d;
+  --primary-500: #e69c69;
+  --primary-700: #bf6f4a;
+  --primary-900: #8a4836;
+  --secondary-500: #FFA800;
+  --danger-500: #ff2525;
+  --success-500: #27B510;
+
+  color:white;
+}
 body{
-  width:100%;
-  height:100%;  
-
-  display:flex;
-  flex-direction:column;
-  align-items: center;
+  background-color: var(--shade-100);
+  padding:40px 30px;
+  margin:0;
 }
 
-.map-container{
-  width:500px;
-  height:auto;
+h1,h2,h3,h4,h5,p{
+  margin:0;
 }
-#map{
-  display:grid;
-  height:100%;
-  width:100%;
-  /* grid-template-columns: repeat(100, 1fr);
-  grid-template-rows: repeat(40, 1fr); */
-  background-color:rgb(100, 100, 100);
+h1,h2,h3,h4,h5{
+  font-weight:normal;
+  font-family: "DisrespectfulTee";
 }
+p, input, button, label, select{
+  font-family: "NESCyrillic";
+}
+
+h1{
+  font-size: 45px;
+}
+
+h2{
+  font-size: 21px;
+}
+
+p{
+  font-size: 18px;
+}
+
+textarea,select{
+  height: 20px;
+}
+
+button{
+  border:none;
+  padding:13px 47px;
+  transition-property: background-color;
+  transition-duration: 200ms;
+  transition-timing-function: ease-out;
+}
+
+button:hover{
+  background-color:rgb(202, 202, 202);
+}
+
+button:active:hover{
+  background-color:orange;
+  color:white;
+}
+
 .row{
   display:flex;
-  flex-direction:row;
+  flex-direction: row;
+}
 
+.column{
+  display:flex;
+  flex-direction: column;
+}
+.justify-space-between{
+  justify-content: space-between;
+}
+#map-maker-wrapper{
   width:100%;
-  height:100%;
-
-  background-color:pink;
+  display:grid;
+  grid-auto-flow: column;
+  grid-template-columns: 330px 1fr;
+  gap:10px;
 }
 
-.tile{
-  aspect-ratio: 1/1;
-  width:100%;
-  height:auto;
-  background-color:blue;
-  outline: 1px solid rgba(255, 255, 255, 0);
-  z-index: 0;
-  transition-property:outline  z-index  ;
-  transition: outline 0.4s linear  , z-index 1s ease-out ;
+/* menu styles */
+
+#menu{
+  gap:35px;
 }
 
-#result , #map-input{
-  background-color:rgb(0, 0, 0);
-  color:white;
-
-  width:500px;
-  height:500px;
+.menu-section{
+  gap:16px;
 }
 
-
+.map-size{
+  gap:9px;
+}
 
 #paints{
   display:grid;
   grid-template-columns: 1fr 1fr;
   margin-top:30px;
-  gap:10px;
+  gap:5px;
 }
 
 #paints div{
@@ -66,9 +129,12 @@ body{
   margin: 0;
 }
 
+.paint-header{
+  font-size:14px;
+}
 .paint-tile{
-  width:20px;
-  height:20px;
+  width:15px;
+  height:15px;
   /* background-color:red; */
 }
 
@@ -98,41 +164,29 @@ body{
   background-color:#0027d2;
 }
 
-.check-point-right-road{
+.check-point-r-road{
   background-color:rgb(187, 187, 187);
 }
-.check-point-right-dirt{
+.check-point-r-dirt{
   background-color:rgb(216, 216, 216);
 }
 
-.check-point-left-road{
+.check-point-l-road{
   background-color:rgb(78, 135, 162);
 }
-.check-point-left-dirt{
+.check-point-l-dirt{
   background-color:rgb(72, 183, 216);
 }
-#map-size{
+
+/* map styles */
+
+#map-canvas-wrapper{
   display:flex;
-  flex-direction:column;
+  flex-direction: column;
   align-items: center;
-  gap:10px;
-  margin:30px 0;
-}
-#map-size .dimensions{
-  display:flex;
-  flex-direction:row;
-  align-items: center;
-  gap:10px;
 }
 
-#map-size input{
-  height:30px;
-  border-radius:10px;
-}
-
-.tile-hover{
-  position:relative;
-  z-index: 1;
-  outline: 3px solid white;
-  transition-property: outline;
+#map-canvas{
+  image-rendering: pixelated;
+  width:100%;
 }

@@ -8,51 +8,60 @@
   <link href="style.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Draw your map below</h1>
+  <div id="map-maker-wrapper">
+    <div id="menu" class="column">
+      <h1>Map Maker</h1>
+      <button id="copy-to-clipboard">Copy map to clipboard</button>
+      
+      <!-- map size -->
+      <div class="menu-section column"> 
 
-  <h2>Map Size</h2>
-  <form id="map-size">
-    <div class="dimenstions">
-      <label for="rows" name="dimensions">Rows</label>
-      <input id="rows" value="150">
-  
-      <label for="cols" name="dimensions">Columns</label>
-      <input id="cols" value="150">
+        <h2>Map Size</h2>
+        <form class="map-size column">
+          <button id="map-size-submit">Change map Size</button>
+          <div class="row justify-space-between">
+            <label for="rows" name="dimensions">Rows</label>
+            <input id="rows" value="150">
+          </div>
+          <div class="row justify-space-between">
+            <label for="cols" name="dimensions">Columns</label>
+            <input id="cols" value="150">
+          </div>
+        </form>
+      </div>
+
+      <!-- brush styles -->
+      <div class="menu-section column">
+        <h2>Brush Style</h2>
+        <div class="column">
+          <p>Brush Color</p>
+          <div id="paints" class="row">
+            
+          </div>
+        </div>
+        <div class="column">
+          <label for="brush-size-select">Brush Size:
+          </label>
+          <select id="brush-size-select">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>fill</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- map import -->
+      <div class="menu-section column">
+        <textarea id="map-input" placeholder="Paste map data here..."></textarea>
+        <button id="upload">Load Map</button>
+      </div>
+
     </div>
-    <button type="submit" form="map-size" value="change-size" id="map-size-submit">Change Size</button>
-
-  </form>
-  <h2>Paints</h2>
-
-  <label for="brush-size-select">Brush Size:
-  </label>
-  <select id="brush-size-select">
-    <option>1</option>
-    <option>2</option>
-    <option>3</option>
-    <option>fill</option>
-  </select>
-  <div id="paints">
-    
-  </div>
-  <h2>Board</h2>
-  <canvas id="map-canvas"></canvas>
-  <div class="map-container">
-      <div class="inner" id="map">
+    <div id="map-canvas-wrapper">
+      <canvas id="map-canvas"></canvas>
     </div>
-
   </div>
-
-
-  <button id="print">Print 2d map Array</button>
-
-
-  <textarea id="result"></textarea>
-
-  <button id="upload">Upload your own MapData</button>
-
-
-  <textarea id="map-input"></textarea>
   <script src="main.js"></script>
 </body>
 </html>
