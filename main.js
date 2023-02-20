@@ -68,6 +68,28 @@ let brushSizes = //each brush size is an array of coord objects
   ],
   brush3: [
     {r:-1,c:0},{r:0,c:-1},{r:0,c:0},{r:1,c:0},{r:0,c:1}
+  ],
+  brush5: [
+    {r:-2,c:-1},{r:-2,c:0},{r:-2,c:1},
+
+    {r:-1,c:-2},{r:-1,c:-1},{r:-1,c:0},{r:-1,c:1},{r:-1,c:2},
+    {r:0,c:-2},{r:0,c:-1},{r:0,c:0},{r:0,c:1},{r:0,c:2},
+    {r:1,c:-2},{r:1,c:-1},{r:1,c:0},{r:1,c:1},{r:1,c:2},
+
+    {r:2,c:-1},{r:2,c:0},{r:2,c:1}
+  ],
+  brush11: [ //lol
+    {r:-5,c:-1},{r:-5,c:0},{r:-5,c:1},
+    {r:-4,c:-3},{r:-4,c:-2},{r:-4,c:-1},{r:-4,c:0},{r:-4,c:1},{r:-4,c:2},{r:-4,c:3},
+    {r:-3,c:-4},{r:-3,c:-3},{r:-3,c:-2},{r:-3,c:-1},{r:-3,c:0},{r:-3,c:1},{r:-3,c:2},{r:-3,c:3},{r:-3,c:4},
+    {r:-2,c:-4},{r:-2,c:-3},{r:-2,c:-2},{r:-2,c:-1},{r:-2,c:0},{r:-2,c:1},{r:-2,c:2},{r:-2,c:3},{r:-2,c:4},
+    {r:-1,c:-5},{r:-1,c:-4},{r:-1,c:-3},{r:-1,c:-2},{r:-1,c:-1},{r:-1,c:0},{r:-1,c:1},{r:-1,c:2},{r:-1,c:3},{r:-1,c:4},{r:-1,c:5},
+    {r:0,c:-5},{r:0,c:-4},{r:0,c:-3},{r:0,c:-2},{r:0,c:-1},{r:0,c:0},{r:0,c:1},{r:0,c:2},{r:0,c:3},{r:0,c:4},{r:0,c:5},
+    {r:1,c:-5},{r:1,c:-4},{r:1,c:-3},{r:1,c:-2},{r:1,c:-1},{r:1,c:0},{r:1,c:1},{r:1,c:2},{r:1,c:3},{r:1,c:4},{r:1,c:5},
+    {r:2,c:-4},{r:2,c:-3},{r:2,c:-2},{r:2,c:-1},{r:2,c:0},{r:2,c:1},{r:2,c:2},{r:2,c:3},{r:2,c:4},
+    {r:3,c:-4},{r:3,c:-3},{r:3,c:-2},{r:3,c:-1},{r:3,c:0},{r:3,c:1},{r:3,c:2},{r:3,c:3},{r:3,c:4},
+    {r:4,c:-3},{r:4,c:-2},{r:4,c:-1},{r:4,c:0},{r:4,c:1},{r:4,c:2},{r:4,c:3},
+    {r:5,c:-1},{r:5,c:0},{r:5,c:1}
   ]
 }
 
@@ -198,7 +220,21 @@ const fillTiles = (c,r,currentFill) => {
           setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
         }
      }
-      break;
+    break;
+    case (currentFill.size == 5):
+      if(c - 2 >= leftBound && c + 2 <= rightBound && r - 2 > topBound && r + 2 < bottomBound) {
+        for(let coord of brushSizes.brush5){      
+          setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
+        }
+     }
+    break;
+    case (currentFill.size == 11):
+      if(c - 5 >= leftBound && c + 5 <= rightBound && r - 5 > topBound && r + 5 < bottomBound) {
+        for(let coord of brushSizes.brush11){      
+          setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
+        }
+     }
+    break;
     case (currentFill.size == "fill"):
       bucketFill(r,c,currentFill.type,mapData[r][c]);
       break;
