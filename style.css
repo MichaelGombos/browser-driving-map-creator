@@ -79,6 +79,10 @@ button:active:hover{
   color:white;
 }
 
+.hidden{
+  display:none;
+}
+
 .row{
   display:flex;
   flex-direction: row;
@@ -109,8 +113,31 @@ button:active:hover{
   gap:16px;
 }
 
-.map-size{
+.map-size,.image-overlay{
   gap:9px;
+}
+
+.custom-file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+.custom-file-input::before {
+  color:var(--shade-100);
+  content: 'Choose a file';
+  display: inline-block;
+  background-color:rgb(239,239,239);
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13.33px;
+}
+.custom-file-input:hover::before {
+  border-color: black;
+}
+.custom-file-input:active::before {
+  background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
 }
 
 #paints{
@@ -182,6 +209,8 @@ button:active:hover{
 
 #map-canvas-wrapper{
   display:flex;
+  position: relative;
+  height:fit-content;
   flex-direction: column;
   align-items: center;
 }
@@ -189,4 +218,21 @@ button:active:hover{
 #map-canvas{
   image-rendering: pixelated;
   width:100%;
+  height:fit-content;
+}
+
+#overlay-wrapper{
+  height:100%;
+  width:100%;
+  position: absolute;
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+  pointer-events: none;
+}
+#overlay{
+  position: relative;
+  max-width:100%;
+  height: auto;
+  opacity: .3;
 }

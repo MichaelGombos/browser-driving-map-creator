@@ -23,6 +23,12 @@ const mapInput = document.querySelector("#map-input")
 const brushSizeSelect = document.querySelector("#brush-size-select")
 const copyToClipboardButton = document.querySelector("#copy-to-clipboard");
 
+const imageOverlay = document.querySelector("#overlay");
+const imageOverlayUrlInput = document.querySelector("#overlay-url");
+const imageOverlayFileInput = document.querySelector("#overlay-local-file");
+const imageOverlaySubmit = document.querySelector("#overlay-submit");
+const imageOverlayClear = document.querySelector("#overlay-clear");
+
 const canvasMap = document.querySelector("canvas");
 
 
@@ -55,10 +61,10 @@ let newColumn;
 let brushSizes = //each brush size is an array of coord objects
 {
   finish: [
-    {r:0, c:-2}, { r:0, c:-1 },{ r:0,  c:0 }, { r:0 , c:1} , {r:0, c:2}
+    {r:0, c:-5}, {r:0, c:-4}, {r:0, c:-3}, {r:0, c:-2}, { r:0, c:-1 },{ r:0,  c:0 }, { r:0 , c:1} , {r:0, c:2}, {r:0, c:3}, {r:0, c:4}, {r:0, c:5}
   ],
   checkPoint: [
-    {r:-2, c:0}, { r:-1, c:0 },{ r:0,  c:0 }, { r:1 , c:0} , {r:2, c:0}
+    {r:-5, c:0}, {r:-4, c:0}, {r:-3, c:0}, {r:-2, c:0}, { r:-1, c:0 },{ r:0,  c:0 }, { r:1 , c:0} , {r:2, c:0}, {r:3, c:0}, {r:4, c:0}, {r:5, c:0}
   ],
   brush1: [
     {r:0,c:0}
@@ -178,6 +184,9 @@ const fillTiles = (c,r,currentFill) => {
       spawnTile.row = r;
       spawnTile.column = c;
       break;
+    case (currentFill.size == "fill"):
+      bucketFill(r,c,currentFill.type,mapData[r][c]);
+      break;
     case (currentFill.type.tileName == "check-point-l-road" ||
     currentFill.type.tileName == "check-point-r-road" ||
     currentFill.type.tileName == "check-point-l-dirt" ||
@@ -235,9 +244,7 @@ const fillTiles = (c,r,currentFill) => {
         }
      }
     break;
-    case (currentFill.size == "fill"):
-      bucketFill(r,c,currentFill.type,mapData[r][c]);
-      break;
+
   }
       //set center tile
       setTile({r:r,c:c},currentFill.type);
@@ -308,6 +315,37 @@ function getMousePos(canvas, evt) {
   };
 }
 
+const handleUploadImageOverlay = e => {
+  e.preventDefault();
+  // var preview = document.querySelector('img');
+  const file    = imageOverlayFileInput.files[0];
+  const url = imageOverlayUrlInput.value;
+  const reader  = new FileReader();
+
+  reader.onloadend = function () {
+    imageOverlay.src = reader.result;
+  }
+
+  if (file) {
+    imageOverlay.classList.remove("hidden");
+    reader.readAsDataURL(file);
+  } else {
+    imageOverlay.classList.add("hidden");
+    imageOverlay.src = "";
+    if(url){
+      imageOverlay.classList.remove("hidden");
+      imageOverlay.src = url;
+    }
+  }
+}
+
+const handleClearImageOverlay = e => {
+
+  e.preventDefault();
+  imageOverlay.classList.add("hidden");
+  imageOverlay.src = "";
+}
+
 const generateDefaultMapData = (rows,columns) => {
   let primativeMapData = [];
 
@@ -349,9 +387,6 @@ for(let type of tileTypes){
 
 
   paints.appendChild(paint);
-
-
-  
 }
 
 
@@ -366,3 +401,6 @@ brushSizeSelect.addEventListener("change", handleBrushSizeChange);
 
 canvasMap.addEventListener("mousemove", handleCanvasMouseMovement)
 canvasMap.addEventListener("click", handleCanvasMouseClick)
+
+imageOverlaySubmit.addEventListener("click", handleUploadImageOverlay)
+imageOverlayClear.addEventListener("click", handleClearImageOverlay)

@@ -10,13 +10,26 @@
 <body>
   <div id="map-maker-wrapper">
     <div id="menu" class="column">
-      <h1>Map Maker</h1>
+      <h1>map MAKER</h1>
       <button id="copy-to-clipboard">Copy map to clipboard</button>
       
+
+      <!-- image overlay -->
+      <div class="menu-section column"> 
+
+        <h2>image overlay</h2>
+        <form class="image-overlay column">
+          <textarea id="overlay-url" placeholder="Enter url..."></textarea>
+          <input type="file" class="custom-file-input" id="overlay-local-file"></input>
+          <button id="overlay-submit">Load Image</button>
+          <button id="overlay-clear">Clear Image</button>
+        </form>
+      </div>
+
       <!-- map size -->
       <div class="menu-section column"> 
 
-        <h2>Map Size</h2>
+        <h2>map size</h2>
         <form class="map-size column">
           <button id="map-size-submit">Change map Size</button>
           <div class="row justify-space-between">
@@ -32,7 +45,7 @@
 
       <!-- brush styles -->
       <div class="menu-section column">
-        <h2>Brush Style</h2>
+        <h2>brush style</h2>
         <div class="column">
           <p>Brush Color</p>
           <div id="paints" class="row">
@@ -61,6 +74,9 @@
 
     </div>
     <div id="map-canvas-wrapper">
+      <div id="overlay-wrapper">
+        <img id="overlay" class="hidden"/>
+      </div>
       <canvas id="map-canvas"></canvas>
     </div>
   </div>
