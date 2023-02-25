@@ -136,6 +136,59 @@ const setTile = (coords, type, modifier = 1) => {
   context.fillRect(coords.c,coords.r,modifier,modifier);
 }
 
+const verticalFill = (r,c, type, current) => {
+  //If row is less than 0
+    if(r < 0){
+        return;
+    }
+    //If row is greater than map length
+    if(r > mapData.length - 1){
+        return;
+    }
+    //If column is greater than map length
+    if(c > mapData[r].length - 1){
+        return;
+    }
+    //If the current tile is not the type we need to swap
+    if(mapData[r][c] !== current){
+        return;
+    }
+     //Update the new tpe
+     setTile({r:r,c:c},type)
+     //Fill in ROW directions
+     verticalFill(r-1,c, type, current);
+     verticalFill(r+1,c, type, current);
+}
+
+const horizontalFill = (r,c, type, current) => {
+  //If row is less than 0
+    if(r < 0){
+        return;
+    }
+
+    //If row is greater than map length
+    if(r > mapData.length - 1){
+        return;
+    }
+
+    //If column is greater than map length
+    if(c > mapData[r].length - 1){
+        return;
+    }
+
+    //If the current tile is not the type we need to swap
+    if(mapData[r][c] !== current){
+        return;
+    }
+    
+     //Update the new tpe
+     setTile({r:r,c:c},type)
+     //Fill in ROW directions
+     horizontalFill(r,c-1, type, current);
+     horizontalFill(r,c+1, type, current);
+}
+
+
 const bucketFill = (r,c, type, current) => {
   //If row is less than 0
     if(r < 0){
@@ -195,30 +248,10 @@ const fillTiles = (c,r,currentFill) => {
     currentFill.type.tileName == "check-point-r-road" ||
     currentFill.type.tileName == "check-point-l-dirt" ||
     currentFill.type.tileName == "check-point-r-dirt" ):
-      const checkPointLineBroken = r - 2 < topBound || r + 2 > bottomBound; //total size of 5
-
-      if(checkPointLineBroken){
-        //set current tile to road
-        setTile({r:r,c:c}, tileTypes[0])
-      }
-      else{
-        for(let coord of brushSizes.checkPoint){      
-          setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
-        }
-      }
+      verticalFill(r,c,currentFill.type,mapData[r][c]);
       break;
     case (currentFill.type.tileName == "finish-up" || currentFill.type.tileName == "finish-down"):
-      const finishLineBroken = c - 2 < leftBound || c + 2 > rightBound; //total size of 5
-
-      if(finishLineBroken){
-        //set current tile to road
-        setTile({r:r,c:c}, tileTypes[0])
-      }
-      else{
-        for(let coord of brushSizes.finish){      
-          setTile({r:r+coord.r,c:c+coord.c},currentFill.type);
-        }
-      }
+      horizontalFill(r,c,currentFill.type,mapData[r][c]);
       break;
     case (currentFill.size == 2):
       if(c + 1 <= rightBound && r + 1 <= bottomBound){
