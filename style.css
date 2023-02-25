@@ -117,6 +117,15 @@ button:active:hover{
   gap:9px;
 }
 
+.spawn-angle-text{
+  display: flex;
+  gap:10px;
+}
+#angle-graphic{
+  height:15px;
+  width:15px;
+}
+
 .custom-file-input::-webkit-file-upload-button {
   visibility: hidden;
 }

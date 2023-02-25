@@ -29,6 +29,10 @@ const imageOverlayFileInput = document.querySelector("#overlay-local-file");
 const imageOverlaySubmit = document.querySelector("#overlay-submit");
 const imageOverlayClear = document.querySelector("#overlay-clear");
 
+const lapCount = document.querySelector("#lap-count");
+const spawnAngle = document.querySelector("#spawn-angle");
+const spawnAngleGraphic = document.querySelector("#angle-graphic");
+
 const canvasMap = document.querySelector("canvas");
 
 
@@ -273,13 +277,13 @@ const handleBrushSizeChange = (e) => {
 
 
 const handleCopy = (e) => {
-  let arrayString = "[" + mapData.map(mapRow => "\n[" + mapRow.map(cell => cell ) + "]") + "\n]";
+  let arrayString = `{ "spawnAngle" : ${spawnAngle.value} , "lapCount" : ${lapCount.value} , "data" : [${mapData.map(mapRow => "\n[" + mapRow.map(cell => cell ) + "]")}\n] } `;
 
   copyToClipboard(arrayString);
 }
 
 const handleUpload = (e) => {
-  generateCanvasMapColor(canvasMap, JSON.parse("[" + mapInput.value + "]")[0])
+  generateCanvasMapColor(canvasMap, JSON.parse(mapInput.value).data)
 }
 
 const handleMapSizeChange = (e) => {
@@ -365,6 +369,11 @@ const generateDefaultMapData = (rows,columns) => {
   return primativeMapData;
 }
 
+const handleSpawnAngleChange = e => {
+  console.log(e.target.value)
+  spawnAngleGraphic.style.transform = `rotate(${e.target.value}deg)`;
+}
+
 generateCanvasMapColor(canvasMap, generateDefaultMapData(rows,columns))
 
 //display tiles 
@@ -404,3 +413,5 @@ canvasMap.addEventListener("click", handleCanvasMouseClick)
 
 imageOverlaySubmit.addEventListener("click", handleUploadImageOverlay)
 imageOverlayClear.addEventListener("click", handleClearImageOverlay)
+
+spawnAngle.addEventListener("change",handleSpawnAngleChange)
