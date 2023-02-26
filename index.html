@@ -11,7 +11,10 @@
   <div id="map-maker-wrapper">
     <div id="menu" class="column">
       <h1>map MAKER</h1>
-      <button id="copy-to-clipboard">Copy map to clipboard</button>
+      <div class="column gap-8">
+        <button id="copy-to-clipboard">Copy map to clipboard</button>
+        <button id="copy-compressed-to-clipboard">Copy compressed map to clipboard</button>
+      </div>
       
 
       <!-- image overlay -->
@@ -84,6 +87,7 @@
       <div class="menu-section column">
         <textarea id="map-input" placeholder="Paste map data here..."></textarea>
         <button id="upload">Load Map</button>
+        <button id="upload-compressed">Load Compressed Map</button>
       </div>
 
     </div>
@@ -94,6 +98,6 @@
       <canvas id="map-canvas"></canvas>
     </div>
   </div>
-  <script src="main.js"></script>
+  <script src="main.js" type="module"></script>
 </body>
 </html>

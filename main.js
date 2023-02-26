@@ -1,3 +1,6 @@
+import {compressMapData,decompressMapData} from "./map-compression.js"
+import logSizeInBytes from "./size-in-bytes.js";
+
 const tileTypes = [
   {  tileName:"road",   value:0 , color: "#FFA500"},
   {  tileName:"wall", value:1, color: "#FF0000"},
@@ -19,9 +22,11 @@ const map = document.querySelector("#map");
 const paints = document.querySelector("#paints");
 
 const uploadButton = document.querySelector("#upload");
+const uploadCompressedButton = document.querySelector("#upload-compressed");
 const mapInput = document.querySelector("#map-input")
 const brushSizeSelect = document.querySelector("#brush-size-select")
 const copyToClipboardButton = document.querySelector("#copy-to-clipboard");
+const copyCompressedToClipboardButton = document.querySelector("#copy-compressed-to-clipboard");
 
 const imageOverlay = document.querySelector("#overlay");
 const imageOverlayUrlInput = document.querySelector("#overlay-url");
@@ -311,12 +316,28 @@ const handleBrushSizeChange = (e) => {
 
 const handleCopy = (e) => {
   let arrayString = `{ "spawnAngle" : ${spawnAngle.value} , "lapCount" : ${lapCount.value} , "data" : [${mapData.map(mapRow => "\n[" + mapRow.map(cell => cell ) + "]")}\n] } `;
-
+  logSizeInBytes("NON COMPRESSED", arrayString);
+  copyToClipboard(arrayString);
+}
+const handleCopyCompressed = (e) => {
+  let arrayString = `{ "spawnAngle" : ${spawnAngle.value} , "lapCount" : ${lapCount.value} , "data" : [${ compressMapData(mapData).map(mapRow => "\n[" + mapRow.map(cell => `"${cell}"`) + "]")}\n] } `;
+  logSizeInBytes("COMPRESSED", arrayString);
   copyToClipboard(arrayString);
 }
 
 const handleUpload = (e) => {
-  generateCanvasMapColor(canvasMap, JSON.parse(mapInput.value).data)
+  let map = JSON.parse(mapInput.value);
+  spawnAngle.value = map.spawnAngle;
+  lapCount.value = map.lapCount;
+  generateCanvasMapColor(canvasMap, map.data)
+}
+
+const handleUploadCompressed = (e) => {
+  let map = JSON.parse(mapInput.value);
+  spawnAngle.value = map.spawnAngle;
+  lapCount.value = map.lapCount;
+  console.log(decompressMapData(map.data))
+  generateCanvasMapColor(canvasMap, decompressMapData(map.data))
 }
 
 const handleMapSizeChange = (e) => {
@@ -433,7 +454,9 @@ for(let type of tileTypes){
 
 
 uploadButton.addEventListener("click",handleUpload);
+uploadCompressedButton.addEventListener("click",handleUploadCompressed);
 copyToClipboardButton.addEventListener("click", handleCopy)
+copyCompressedToClipboardButton.addEventListener("click", handleCopyCompressed)
 
 document.addEventListener("mousedown", () => painting = true)
 document.addEventListener("mouseup", () => painting = false);

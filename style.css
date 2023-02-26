@@ -95,6 +95,9 @@ button:active:hover{
 .justify-space-between{
   justify-content: space-between;
 }
+.gap-8{
+  gap:8px;
+}
 #map-maker-wrapper{
   width:100%;
   display:grid;
